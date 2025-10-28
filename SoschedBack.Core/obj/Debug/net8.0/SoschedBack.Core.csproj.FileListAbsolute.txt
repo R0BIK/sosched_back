@@ -1,0 +1,14 @@
+/Users/ROBIK/Desktop/SoschedBack/SoschedBack/SoschedBack.Core/bin/Debug/net8.0/SoschedBack.Core.deps.json
+/Users/ROBIK/Desktop/SoschedBack/SoschedBack/SoschedBack.Core/bin/Debug/net8.0/SoschedBack.Core.dll
+/Users/ROBIK/Desktop/SoschedBack/SoschedBack/SoschedBack.Core/bin/Debug/net8.0/SoschedBack.Core.pdb
+/Users/ROBIK/Desktop/SoschedBack/SoschedBack/SoschedBack.Core/obj/Debug/net8.0/SoschedBack.Core.csproj.AssemblyReference.cache
+/Users/ROBIK/Desktop/SoschedBack/SoschedBack/SoschedBack.Core/obj/Debug/net8.0/SoschedBack.Core.GeneratedMSBuildEditorConfig.editorconfig
+/Users/ROBIK/Desktop/SoschedBack/SoschedBack/SoschedBack.Core/obj/Debug/net8.0/SoschedBack.Core.AssemblyInfoInputs.cache
+/Users/ROBIK/Desktop/SoschedBack/SoschedBack/SoschedBack.Core/obj/Debug/net8.0/SoschedBack.Core.AssemblyInfo.cs
+/Users/ROBIK/Desktop/SoschedBack/SoschedBack/SoschedBack.Core/obj/Debug/net8.0/SoschedBack.Core.csproj.CoreCompileInputs.cache
+/Users/ROBIK/Desktop/SoschedBack/SoschedBack/SoschedBack.Core/obj/Debug/net8.0/SoschedBack.Core.dll
+/Users/ROBIK/Desktop/SoschedBack/SoschedBack/SoschedBack.Core/obj/Debug/net8.0/refint/SoschedBack.Core.dll
+/Users/ROBIK/Desktop/SoschedBack/SoschedBack/SoschedBack.Core/obj/Debug/net8.0/SoschedBack.Core.pdb
+/Users/ROBIK/Desktop/SoschedBack/SoschedBack/SoschedBack.Core/obj/Debug/net8.0/ref/SoschedBack.Core.dll
+/Users/ROBIK/Desktop/SoschedBack/SoschedBack/SoschedBack.Core/bin/Debug/net8.0/SoschedBack.Core.runtimeconfig.json
+/Users/ROBIK/Desktop/SoschedBack/SoschedBack/SoschedBack.Core/obj/Debug/net8.0/SoschedBack.Core.genruntimeconfig.cache

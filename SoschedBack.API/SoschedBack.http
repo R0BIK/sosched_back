@@ -1,0 +1,6 @@
+@SoschedBack_HostAddress = http://localhost:5056
+
+GET {{SoschedBack_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

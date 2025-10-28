@@ -1,0 +1,17 @@
+/Users/ROBIK/Desktop/SoschedBack/SoschedBack/SoschedBack.Storage/bin/Debug/net8.0/SoschedBack.Storage.deps.json
+/Users/ROBIK/Desktop/SoschedBack/SoschedBack/SoschedBack.Storage/bin/Debug/net8.0/SoschedBack.Storage.dll
+/Users/ROBIK/Desktop/SoschedBack/SoschedBack/SoschedBack.Storage/bin/Debug/net8.0/SoschedBack.Storage.pdb
+/Users/ROBIK/Desktop/SoschedBack/SoschedBack/SoschedBack.Storage/bin/Debug/net8.0/SoschedBack.Core.dll
+/Users/ROBIK/Desktop/SoschedBack/SoschedBack/SoschedBack.Storage/bin/Debug/net8.0/SoschedBack.Core.pdb
+/Users/ROBIK/Desktop/SoschedBack/SoschedBack/SoschedBack.Storage/obj/Debug/net8.0/SoschedBack.Storage.csproj.AssemblyReference.cache
+/Users/ROBIK/Desktop/SoschedBack/SoschedBack/SoschedBack.Storage/obj/Debug/net8.0/SoschedBack.Storage.GeneratedMSBuildEditorConfig.editorconfig
+/Users/ROBIK/Desktop/SoschedBack/SoschedBack/SoschedBack.Storage/obj/Debug/net8.0/SoschedBack.Storage.AssemblyInfoInputs.cache
+/Users/ROBIK/Desktop/SoschedBack/SoschedBack/SoschedBack.Storage/obj/Debug/net8.0/SoschedBack.Storage.AssemblyInfo.cs
+/Users/ROBIK/Desktop/SoschedBack/SoschedBack/SoschedBack.Storage/obj/Debug/net8.0/SoschedBack.Storage.csproj.CoreCompileInputs.cache
+/Users/ROBIK/Desktop/SoschedBack/SoschedBack/SoschedBack.Storage/obj/Debug/net8.0/SoschedBack.Storage.csproj.CopyComplete
+/Users/ROBIK/Desktop/SoschedBack/SoschedBack/SoschedBack.Storage/obj/Debug/net8.0/SoschedBack.Storage.dll
+/Users/ROBIK/Desktop/SoschedBack/SoschedBack/SoschedBack.Storage/obj/Debug/net8.0/refint/SoschedBack.Storage.dll
+/Users/ROBIK/Desktop/SoschedBack/SoschedBack/SoschedBack.Storage/obj/Debug/net8.0/SoschedBack.Storage.pdb
+/Users/ROBIK/Desktop/SoschedBack/SoschedBack/SoschedBack.Storage/obj/Debug/net8.0/ref/SoschedBack.Storage.dll
+/Users/ROBIK/Desktop/SoschedBack/SoschedBack/SoschedBack.Storage/bin/Debug/net8.0/SoschedBack.Storage.runtimeconfig.json
+/Users/ROBIK/Desktop/SoschedBack/SoschedBack/SoschedBack.Storage/obj/Debug/net8.0/SoschedBack.Storage.genruntimeconfig.cache
