@@ -2,11 +2,17 @@ using SoschedBack.Core.Models.Interfaces;
 
 namespace SoschedBack.Core.Models;
 
+//TODO: add foreign key SpaceId
+
 public class Event : AuditableEntity
 {
     public int Id { get; set; }
     
+    public int EventTypeId { get; set; }
+    
     public string Name { get; set; } = null!;
+    
+    public int InstructirId { get; set; }
     
     public string? Location { get; set; }
     

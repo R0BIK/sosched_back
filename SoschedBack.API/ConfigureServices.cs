@@ -1,0 +1,46 @@
+using Microsoft.EntityFrameworkCore;
+using SoschedBack.Storage;
+
+namespace SoschedBack;
+
+public static class ConfigureServices
+{
+    public static void AddServices(this WebApplicationBuilder builder)
+    {
+        builder.AddSwagger();
+        builder.AddDatabase();
+        // builder.AddJwtAuthentication();
+        // builder.AddAuthorization();
+        //
+        // builder.Services.AddValidatorsFromAssembly(typeof(ConfigureServices).Assembly);
+        //
+        // builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
+        // builder.Services.AddScoped<IUserService, UserService>();
+    }
+
+    private static void AddSwagger(this WebApplicationBuilder builder)
+    {
+        builder.Services.AddEndpointsApiExplorer();
+        builder.Services.AddSwaggerGen(options =>
+        {
+            options.CustomSchemaIds(type => type.FullName?.Replace('+', '.') ?? type.Name);
+        });
+    }
+    
+    private static void AddDatabase(this WebApplicationBuilder builder)
+    {
+        var connectionString = builder.Configuration.GetConnectionString("Local")
+                               ?? throw new InvalidOperationException("Connection string 'Local' not found.");
+
+        connectionString = connectionString
+            .Replace("${POSTGRES_HOST}", Environment.GetEnvironmentVariable("POSTGRES_HOST") ?? "localhost")
+            .Replace("${POSTGRES_DB}", Environment.GetEnvironmentVariable("POSTGRES_DB") ?? throw new InvalidOperationException("POSTGRES_DB environment variable not set"))
+            .Replace("${POSTGRES_USER}", Environment.GetEnvironmentVariable("POSTGRES_USER") ?? throw new InvalidOperationException("POSTGRES_USER environment variable not set"))
+            .Replace("${POSTGRES_PASSWORD}", Environment.GetEnvironmentVariable("POSTGRES_PASSWORD") ?? throw new InvalidOperationException("POSTGRES_PASSWORD environment variable not set"));
+
+        builder.Services.AddDbContext<SoschedBackDbContext>(options =>
+        {
+            options.UseNpgsql(connectionString);
+        });
+    }
+}

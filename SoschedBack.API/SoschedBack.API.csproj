@@ -32,4 +32,9 @@
       <ProjectReference Include="..\SoschedBack.Storage\SoschedBack.Storage.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Auth\" />
+      <Folder Include="Roles\" />
+    </ItemGroup>
+
 </Project>
