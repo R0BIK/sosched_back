@@ -12,7 +12,7 @@ public class GetRolesEndpoint : IEndpoint
 {
     public static IEndpointConventionBuilder Map(IEndpointRouteBuilder app) => app
         .MapGet("/", Handle)
-        .WithSummary("Returns a list of tags.");
+        .WithSummary("Returns a list of roles.");
 
     public sealed record Request(
         int? Page = 1,
@@ -23,10 +23,7 @@ public class GetRolesEndpoint : IEndpoint
 
     public sealed record Response(
         int Id,
-        string TagType,
-        string Name,
-        string ShortName,
-        string Color
+        string Name
     );
 
     private static async Task<IResult> Handle(
@@ -35,21 +32,18 @@ public class GetRolesEndpoint : IEndpoint
         CancellationToken ct
     )
     {
-        var tags = await database.Tags
+        var roles = await database.Roles
             .ApplySorting(
                 request.SortBy,
                 request.Descending
             )
-            .Select(tag => new Response(
-                tag.Id,
-                tag.TagType.Name,
-                tag.Name,
-                tag.ShortName,
-                tag.Color
+            .Select(role => new Response(
+                role.Id,
+                role.Name
             ))
             .ToPagedListAsync(request, ct);
         
-        var result = Result.Success(tags);
+        var result = Result.Success(roles);
         
         return Results.Ok(result);
     }

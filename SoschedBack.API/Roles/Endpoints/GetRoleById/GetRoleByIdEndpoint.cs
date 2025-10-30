@@ -17,10 +17,7 @@ public class GetRoleByIdEndpoint : IEndpoint
 
     public sealed record Response(
         int Id,
-        int TagType,
-        string Name,
-        string ShortName,
-        string Color
+        string Name
     );
 
     private static async Task<IResult> Handle(
@@ -29,13 +26,13 @@ public class GetRoleByIdEndpoint : IEndpoint
         CancellationToken ct
     )
     {
-        var tag = await database.Tags
+        var role = await database.Roles
             .FirstOrDefaultAsync(i => i.Id == request.Id, ct);
 
-        if (tag == null)
+        if (role == null)
         {
             var error = Error.From(
-                $"Tag with id {request.Id} does not exist.",
+                $"Role with id {request.Id} does not exist.",
                 "ENTITY_DOES_NOT_EXISTS"
             );
             
@@ -43,11 +40,8 @@ public class GetRoleByIdEndpoint : IEndpoint
         }
 
         var response = new Response(
-            tag.Id,
-            tag.TagTypeId,
-            tag.Name,
-            tag.ShortName,
-            tag.Color
+            role.Id,
+            role.Name
         );
         
         var result = Result.Success(response);
