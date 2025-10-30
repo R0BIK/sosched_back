@@ -1,6 +1,8 @@
 using System.Reflection.Metadata;
 using Microsoft.EntityFrameworkCore;
 using SoschedBack.Common;
+using SoschedBack.Common.Extensions;
+using SoschedBack.Common.Pagination.PagedRequest;
 using SoschedBack.Core.Common.UnifiedResponse;
 using SoschedBack.Storage;
 
@@ -12,6 +14,13 @@ public class GetTagsEndpoint : IEndpoint
         .MapGet("/", Handle)
         .WithSummary("Returns a list of tags.");
 
+    public sealed record Request(
+        int? Page = 1,
+        int? PageSize = 10,
+        string? SortBy = null,
+        bool Descending = false
+    ) : IPagedRequest;
+
     public sealed record Response(
         int Id,
         string TagType,
@@ -21,11 +30,16 @@ public class GetTagsEndpoint : IEndpoint
     );
 
     private static async Task<IResult> Handle(
+        [AsParameters] Request request,
         SoschedBackDbContext database,
         CancellationToken ct
     )
     {
         var tags = await database.Tags
+            .ApplySorting(
+                request.SortBy,
+                request.Descending
+            )
             .Select(tag => new Response(
                 tag.Id,
                 tag.TagType.Name,
@@ -33,7 +47,7 @@ public class GetTagsEndpoint : IEndpoint
                 tag.ShortName,
                 tag.Color
             ))
-            .ToListAsync(ct);
+            .ToPagedListAsync(request, ct);
         
         var result = Result.Success(tags);
         

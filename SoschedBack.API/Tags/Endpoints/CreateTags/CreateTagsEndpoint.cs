@@ -47,22 +47,14 @@ public class CreateTagsEndpoint : IEndpoint
 
         var tag = new Tag
         {
-            Name = request.Name,
-            ShortName = request.ShortName,
+            Name = request.Name.Trim(),
+            ShortName = request.ShortName.Trim(),
             Color = request.Color,
             TagTypeId = tagType.Id,
         };
 
-        try
-        {
-            database.Tags.Add(tag);
-            await database.SaveChangesAsync(cancellationToken);
-        }
-        catch (Exception ex)
-        {
-            await Console.Error.WriteLineAsync(ex.Message);
-            return Results.StatusCode(500);
-        }
+        database.Tags.Add(tag);
+        await database.SaveChangesAsync(cancellationToken);
         
         var response = new Response(tag.Id, tag.Name, tag.ShortName, tag.Color, tag.TagTypeId);
         return Results.Ok(response);

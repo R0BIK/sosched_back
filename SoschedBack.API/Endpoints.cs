@@ -1,6 +1,7 @@
 using SoschedBack.Common;
 using SoschedBack.Tags.Endpoints.CreateTags;
 using SoschedBack.Tags.Endpoints.GetTags;
+using SoschedBack.TagTypes.Endpoints.GetTagTypes;
 
 namespace SoschedBack;
 
@@ -9,6 +10,7 @@ public static class Endpoints
     public static void MapEndpoints(this WebApplication app)
     {
         app.MapTagEndpoints();
+        app.MapTagTypeEndpoints();
     }
 
     public static void MapTagEndpoints(this IEndpointRouteBuilder app)
@@ -18,6 +20,14 @@ public static class Endpoints
 
         endpoints.MapEndpoint<GetTagsEndpoint>();
         endpoints.MapEndpoint<CreateTagsEndpoint>();
+    }
+
+    public static void MapTagTypeEndpoints(this IEndpointRouteBuilder app)
+    {
+        var endpoints = app.MapGroup("/tagTypes")
+            .WithTags("TagTypes");
+
+        endpoints.MapEndpoint<GetTagTypesEndpoint>();
     }
     
     private static IEndpointConventionBuilder MapEndpoint<TEndpoint>(this IEndpointRouteBuilder app)

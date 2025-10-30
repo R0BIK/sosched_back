@@ -1,3 +1,4 @@
+using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using SoschedBack.Storage;
 
@@ -9,6 +10,7 @@ public static class ConfigureServices
     {
         builder.AddSwagger();
         builder.AddDatabase();
+        
         // builder.AddJwtAuthentication();
         // builder.AddAuthorization();
         //
@@ -16,6 +18,8 @@ public static class ConfigureServices
         //
         // builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
         // builder.Services.AddScoped<IUserService, UserService>();
+        
+        builder.Services.AddValidatorsFromAssembly(typeof(ConfigureServices).Assembly);
     }
 
     private static void AddSwagger(this WebApplicationBuilder builder)
