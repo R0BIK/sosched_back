@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using SoschedBack.Common;
+using SoschedBack.Common.Extensions;
 using SoschedBack.Core.Common.UnifiedResponse;
 using SoschedBack.Storage;
 
@@ -8,8 +9,9 @@ namespace SoschedBack.Tags.Endpoints.GetTagById;
 public class GetTagByIdEndpoint : IEndpoint
 {
     public static IEndpointConventionBuilder Map(IEndpointRouteBuilder app) => app
-        .MapGet("/", Handle)
-        .WithSummary("Returns a list of tags.");
+        .MapGet("/{id}", Handle)
+        .WithSummary("Returns a tag by id.")
+        .WithRequestValidation<Request>();
 
     public sealed record Request(
         int Id

@@ -118,3 +118,6 @@
 /Users/ROBIK/Desktop/SoschedBack/SoschedBack/SoschedBack.API/bin/Debug/net8.0/zh-Hant/Microsoft.CodeAnalysis.Workspaces.resources.dll
 /Users/ROBIK/Desktop/SoschedBack/SoschedBack/SoschedBack.API/bin/Debug/net8.0/DotNetEnv.dll
 /Users/ROBIK/Desktop/SoschedBack/SoschedBack/SoschedBack.API/bin/Debug/net8.0/Sprache.dll
+/Users/ROBIK/Desktop/SoschedBack/SoschedBack/SoschedBack.API/bin/Debug/net8.0/FluentValidation.dll
+/Users/ROBIK/Desktop/SoschedBack/SoschedBack/SoschedBack.API/bin/Debug/net8.0/FluentValidation.DependencyInjectionExtensions.dll
+/Users/ROBIK/Desktop/SoschedBack/SoschedBack/SoschedBack.API/bin/Debug/net8.0/System.Linq.Dynamic.Core.dll

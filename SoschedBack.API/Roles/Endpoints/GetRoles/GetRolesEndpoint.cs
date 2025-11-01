@@ -12,7 +12,8 @@ public class GetRolesEndpoint : IEndpoint
 {
     public static IEndpointConventionBuilder Map(IEndpointRouteBuilder app) => app
         .MapGet("/", Handle)
-        .WithSummary("Returns a list of roles.");
+        .WithSummary("Returns a list of roles.")
+        .WithRequestValidation<Request>();
 
     public sealed record Request(
         int? Page = 1,

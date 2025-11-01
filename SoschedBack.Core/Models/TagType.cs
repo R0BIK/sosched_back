@@ -2,11 +2,13 @@ using SoschedBack.Core.Models.Interfaces;
 
 namespace SoschedBack.Core.Models;
 
-public class TagType : AuditableEntity
+public class TagType : AuditableEntity, ISpaceEntity
 {
     public int Id { get; set; }
     
     public string Name { get; set; } = null!;
+    
+    public int SpaceEntityId { get; }
     
     public virtual ICollection<Tag> Tags { get; set; } = null!;
 }

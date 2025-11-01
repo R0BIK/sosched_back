@@ -37,6 +37,9 @@ namespace SoschedBack.Storage.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<int>("CoordinatorId")
+                        .HasColumnType("integer");
+
                     b.Property<DateTimeOffset>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
@@ -65,9 +68,6 @@ namespace SoschedBack.Storage.Migrations
                     b.Property<int>("EventTypeId")
                         .HasColumnType("integer");
 
-                    b.Property<int>("InstructirId")
-                        .HasColumnType("integer");
-
                     b.Property<string>("Location")
                         .HasColumnType("text");
 
@@ -81,7 +81,14 @@ namespace SoschedBack.Storage.Migrations
                         .HasColumnName("updated_at")
                         .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("EventTypeId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Events");
                 });
@@ -257,6 +264,9 @@ namespace SoschedBack.Storage.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<int?>("TagToUserId")
+                        .HasColumnType("integer");
+
                     b.Property<int>("TagTypeId")
                         .HasColumnType("integer");
 
@@ -267,6 +277,8 @@ namespace SoschedBack.Storage.Migrations
                         .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("TagToUserId");
 
                     b.HasIndex("TagTypeId");
 
@@ -333,7 +345,7 @@ namespace SoschedBack.Storage.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<DateOnly>("Birthday")
+                    b.Property<DateOnly?>("Birthday")
                         .HasColumnType("date");
 
                     b.Property<DateTimeOffset>("CreatedAt")
@@ -369,7 +381,7 @@ namespace SoschedBack.Storage.Migrations
                     b.Property<string>("Patronymic")
                         .HasColumnType("text");
 
-                    b.Property<int>("RoleId")
+                    b.Property<int?>("TagToUserId")
                         .HasColumnType("integer");
 
                     b.Property<DateTimeOffset>("UpdatedAt")
@@ -380,11 +392,36 @@ namespace SoschedBack.Storage.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("TagToUserId");
+
                     b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("SoschedBack.Core.Models.Event", b =>
+                {
+                    b.HasOne("SoschedBack.Core.Models.EventType", "EventType")
+                        .WithMany()
+                        .HasForeignKey("EventTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SoschedBack.Core.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("EventType");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("SoschedBack.Core.Models.Tag", b =>
                 {
+                    b.HasOne("SoschedBack.Core.Models.TagToUser", null)
+                        .WithMany("Tag")
+                        .HasForeignKey("TagToUserId");
+
                     b.HasOne("SoschedBack.Core.Models.TagType", "TagType")
                         .WithMany("Tags")
                         .HasForeignKey("TagTypeId")
@@ -392,6 +429,20 @@ namespace SoschedBack.Storage.Migrations
                         .IsRequired();
 
                     b.Navigation("TagType");
+                });
+
+            modelBuilder.Entity("SoschedBack.Core.Models.User", b =>
+                {
+                    b.HasOne("SoschedBack.Core.Models.TagToUser", null)
+                        .WithMany("User")
+                        .HasForeignKey("TagToUserId");
+                });
+
+            modelBuilder.Entity("SoschedBack.Core.Models.TagToUser", b =>
+                {
+                    b.Navigation("Tag");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("SoschedBack.Core.Models.TagType", b =>

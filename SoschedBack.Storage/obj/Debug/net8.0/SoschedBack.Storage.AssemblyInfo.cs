@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("SoschedBack.Storage")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+6402a17d7605dc99a1ffaf4af438b0aa7c09bf97")]
 [assembly: System.Reflection.AssemblyProductAttribute("SoschedBack.Storage")]
 [assembly: System.Reflection.AssemblyTitleAttribute("SoschedBack.Storage")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

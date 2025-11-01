@@ -1,18 +1,30 @@
 using FluentValidation;
-using SoschedBack.Common;
+using Microsoft.EntityFrameworkCore;
 using SoschedBack.Common.Extensions;
-using SoschedBack.Core.Common.Regex;
-using Sprache;
+using SoschedBack.Storage;
 
 namespace SoschedBack.Roles.Endpoints.CreateRoles;
 
 public class RequestValidator : AbstractValidator<CreateRolesEndpoint.Request>
 {
-    public RequestValidator()
+    public RequestValidator(SoschedBackDbContext database)
     {
         RuleFor(x => x.Name)
-            .Must(x => string.IsNullOrEmpty(x) || InputSanitizer.Sanitize(x) == x)
-            .WithMessage("Title contains invalid characters.")
-            .ApplyRegexPattern(RegexPatterns.Pattern.Title);
+            .MustBeValidTitle()
+            .DependentRules(() =>
+            {
+                RuleFor(x => x.Name)
+                    .MustAsync(async (name, cancellationToken) =>
+                    {
+                        name = name.Trim();
+
+                        var exists = await database.Roles
+                            .AsNoTracking()
+                            .AnyAsync(r => r.Name == name, cancellationToken);
+
+                        return !exists;
+                    })
+                    .WithMessage("Role with this name already exists.");
+            });
     }
 }

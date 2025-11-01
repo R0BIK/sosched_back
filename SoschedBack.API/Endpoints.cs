@@ -1,6 +1,12 @@
 using SoschedBack.Common;
+using SoschedBack.Roles.Endpoints.CreateRoles;
+using SoschedBack.Roles.Endpoints.GetRoleById;
+using SoschedBack.Roles.Endpoints.GetRoles;
 using SoschedBack.Tags.Endpoints.CreateTags;
+using SoschedBack.Tags.Endpoints.GetTagById;
 using SoschedBack.Tags.Endpoints.GetTags;
+using SoschedBack.TagTypes.Endpoints.CreateTagTypes;
+using SoschedBack.TagTypes.Endpoints.GetTagTypeById;
 using SoschedBack.TagTypes.Endpoints.GetTagTypes;
 
 namespace SoschedBack;
@@ -11,6 +17,17 @@ public static class Endpoints
     {
         app.MapTagEndpoints();
         app.MapTagTypeEndpoints();
+        app.MapRoleEndpoints();
+    }
+    
+    public static void MapRoleEndpoints(this IEndpointRouteBuilder app)
+    {
+        var endpoints = app.MapGroup("/roles")
+            .WithTags("Roles");
+
+        endpoints.MapEndpoint<GetRolesEndpoint>();
+        endpoints.MapEndpoint<GetRoleByIdEndpoint>();
+        endpoints.MapEndpoint<CreateRolesEndpoint>();
     }
 
     public static void MapTagEndpoints(this IEndpointRouteBuilder app)
@@ -19,6 +36,7 @@ public static class Endpoints
             .WithTags("Tags");
 
         endpoints.MapEndpoint<GetTagsEndpoint>();
+        endpoints.MapEndpoint<GetTagByIdEndpoint>();
         endpoints.MapEndpoint<CreateTagsEndpoint>();
     }
 
@@ -28,6 +46,8 @@ public static class Endpoints
             .WithTags("TagTypes");
 
         endpoints.MapEndpoint<GetTagTypesEndpoint>();
+        endpoints.MapEndpoint<GetTagTypeByIdEndpoint>();
+        endpoints.MapEndpoint<CreateTagTypesEndpoint>();
     }
     
     private static IEndpointConventionBuilder MapEndpoint<TEndpoint>(this IEndpointRouteBuilder app)

@@ -2,7 +2,7 @@ using SoschedBack.Core.Models.Interfaces;
 
 namespace SoschedBack.Core.Models;
 
-public class Tag : AuditableEntity
+public class Tag : AuditableEntity, ISpaceEntity
 {
     public int Id { get; set; }
     
@@ -13,6 +13,8 @@ public class Tag : AuditableEntity
     public string ShortName { get; set; } = null!;
     
     public string Color { get; set; } = null!;
+    
+    public int SpaceEntityId { get; }
     
     public virtual TagType TagType { get; set; } = null!;
 }

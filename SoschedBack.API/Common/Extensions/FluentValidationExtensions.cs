@@ -5,6 +5,8 @@ namespace SoschedBack.Common.Extensions;
 
 public static class FluentValidationExtensions
 {
+    
+    //TODO: Check validation for my project
     public static IRuleBuilderOptions<T, string> MustBeValidString<T>(
         this IRuleBuilder<T, string> ruleBuilder)
         where T : class
@@ -19,8 +21,8 @@ public static class FluentValidationExtensions
     {
         return ruleBuilder
             .MustBeValidString()
-            .WithMessage("Title contains invalid characters.");
-        // .ApplyRegexPattern(RegexPatterns.Pattern.Title);
+            .WithMessage("Title contains invalid characters.")
+            .ApplyRegexPattern(RegexPatterns.Pattern.Title);
     }
     
     public static IRuleBuilderOptions<T, string> MustBeValidName<T>(
@@ -39,8 +41,8 @@ public static class FluentValidationExtensions
     {
         return ruleBuilder
             .MustBeValidString()
-            .WithMessage("Description contains invalid characters.");
-        // .ApplyRegexPattern(RegexPatterns.Pattern.Description);
+            .WithMessage("Description contains invalid characters.")
+            .ApplyRegexPattern(RegexPatterns.Pattern.Description);
     }
     
     public static IRuleBuilderOptions<T, string> MustBeValidAddress<T>(
@@ -49,8 +51,8 @@ public static class FluentValidationExtensions
     {
         return ruleBuilder
             .MustBeValidString()
-            .WithMessage("Address contains invalid characters.");
-        // .ApplyRegexPattern(RegexPatterns.Pattern.Address);
+            .WithMessage("Address contains invalid characters.")
+            .ApplyRegexPattern(RegexPatterns.Pattern.Address);
     }
 
     public static IRuleBuilderOptions<T, string> MustBeValidPhoneNumber<T>(
@@ -59,8 +61,8 @@ public static class FluentValidationExtensions
     {
         return ruleBuilder
             .MustBeValidString()
-            .WithMessage("PhoneE164 contains invalid characters.");
-        // .ApplyRegexPattern(RegexPatterns.Pattern.PhoneE164);
+            .WithMessage("PhoneE164 contains invalid characters.")
+            .ApplyRegexPattern(RegexPatterns.Pattern.PhoneE164);
     }
 
     public static IRuleBuilderOptions<T, string> MustBeValidEmail<T>(
@@ -69,8 +71,8 @@ public static class FluentValidationExtensions
     {
         return ruleBuilder
             .MustBeValidString()
-            .WithMessage("Email contains invalid characters.");
-        // .ApplyRegexPattern(RegexPatterns.Pattern.Email);
+            .WithMessage("Email contains invalid characters.")
+            .ApplyRegexPattern(RegexPatterns.Pattern.Email);
     }
     
     public static IRuleBuilderOptions<T, int> MustBeValidId<T>(

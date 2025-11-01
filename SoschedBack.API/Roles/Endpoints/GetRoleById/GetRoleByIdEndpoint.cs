@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using SoschedBack.Common;
+using SoschedBack.Common.Extensions;
 using SoschedBack.Core.Common.UnifiedResponse;
 using SoschedBack.Storage;
 
@@ -9,7 +10,8 @@ public class GetRoleByIdEndpoint : IEndpoint
 {
     public static IEndpointConventionBuilder Map(IEndpointRouteBuilder app) => app
         .MapGet("/", Handle)
-        .WithSummary("Returns a list of tags.");
+        .WithSummary("Returns a role by id.")
+        .WithRequestValidation<Request>();
 
     public sealed record Request(
         int Id

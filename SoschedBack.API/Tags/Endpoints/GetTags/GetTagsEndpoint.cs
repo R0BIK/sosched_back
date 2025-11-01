@@ -12,7 +12,8 @@ public class GetTagsEndpoint : IEndpoint
 {
     public static IEndpointConventionBuilder Map(IEndpointRouteBuilder app) => app
         .MapGet("/", Handle)
-        .WithSummary("Returns a list of tags.");
+        .WithSummary("Returns a list of tags.")
+        .WithRequestValidation<Request>();
 
     public sealed record Request(
         int? Page = 1,

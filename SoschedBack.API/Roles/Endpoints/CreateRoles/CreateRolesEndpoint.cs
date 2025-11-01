@@ -12,7 +12,7 @@ public class CreateRolesEndpoint : IEndpoint
 {
     public static IEndpointConventionBuilder Map(IEndpointRouteBuilder app) => app
         .MapPost("/", Handle)
-        .WithSummary("Creates a new tag")
+        .WithSummary("Creates a new role")
         .WithRequestValidation<Request>();
     
     public sealed record Request(

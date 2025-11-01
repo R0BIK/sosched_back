@@ -4,7 +4,7 @@ namespace SoschedBack.Core.Models;
 
 //TODO: add foreign key SpaceId
 
-public class Event : AuditableEntity
+public class Event : AuditableEntity, ISpaceEntity
 {
     public int Id { get; set; }
     
@@ -12,7 +12,7 @@ public class Event : AuditableEntity
     
     public string Name { get; set; } = null!;
     
-    public int InstructirId { get; set; }
+    public int CoordinatorId { get; set; }
     
     public string? Location { get; set; }
     
@@ -27,4 +27,10 @@ public class Event : AuditableEntity
     public DateTime DateStart { get; set; }
     
     public DateTime DateEnd { get; set; }
+    
+    public int SpaceEntityId { get; }
+    
+    public virtual EventType EventType { get; set; } = null!;
+    
+    public virtual User User { get; set; } = null!;
 }
