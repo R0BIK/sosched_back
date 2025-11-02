@@ -31,16 +31,6 @@ public class GetTagTypeByIdEndpoint : IEndpoint
         var tagType = await database.Tags
             .FirstOrDefaultAsync(i => i.Id == request.Id, ct);
 
-        if (tagType == null)
-        {
-            var error = Error.From(
-                $"Tag type with id {request.Id} does not exist.",
-                "ENTITY_DOES_NOT_EXISTS"
-            );
-            
-            return Results.NotFound(error);
-        }
-
         var response = new Response(
             tagType.Id,
             tagType.Name
@@ -48,6 +38,6 @@ public class GetTagTypeByIdEndpoint : IEndpoint
         
         var result = Result.Success(response);
         
-        return Results.Ok(result);
+        return TypedResults.Ok(result);
     }
 }

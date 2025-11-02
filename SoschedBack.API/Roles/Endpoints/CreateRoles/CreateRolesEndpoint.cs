@@ -1,5 +1,7 @@
 using System.Reflection.Metadata;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
+using SoschedBack.Auth.Endpoints.Login;
 using SoschedBack.Common;
 using SoschedBack.Common.Extensions;
 using SoschedBack.Core.Common.UnifiedResponse;
@@ -24,15 +26,12 @@ public class CreateRolesEndpoint : IEndpoint
         string Name
     );
 
-    private static async Task<IResult> Handle(
+    private static async Task<Ok<Result<Response>>> Handle(
         Request request,
         SoschedBackDbContext database,
         CancellationToken cancellationToken
     )
     {
-        if (await IsRoleNameExists(request.Name, database, cancellationToken)) 
-            return Results.BadRequest($"Role with '{request.Name}' name already exists");
-
         var role = new Role
         {
             Name = request.Name.Trim()
@@ -45,7 +44,7 @@ public class CreateRolesEndpoint : IEndpoint
 
         var result = Result.Success(response);
         
-        return Results.Ok(result);
+        return TypedResults.Ok(result);
     }
 
     private static async Task<bool> IsRoleNameExists(

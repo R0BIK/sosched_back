@@ -8,7 +8,7 @@ public class TagToUser
     
     public int TagId { get; set; }
 
-    public virtual ICollection<User> User { get; set; } = null!;
+    public virtual User User { get; set; } = null!;
     
-    public virtual ICollection<Tag> Tag { get; set; } = null!;
+    public virtual Tag Tag { get; set; } = null!;
 }

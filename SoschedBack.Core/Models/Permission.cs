@@ -9,4 +9,7 @@ public class Permission : AuditableEntity
     public string Name { get; set; } = null!;
     
     public string Description { get; set; } = null!;
+    
+    public virtual ICollection<PermissionToRole> PermissionToRoles { get; set; } = new List<PermissionToRole>();
+
 }

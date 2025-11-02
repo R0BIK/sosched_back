@@ -1,4 +1,4 @@
-using SoschedBack.Common.Filter;
+using SoschedBack.Common.Filters;
 
 namespace SoschedBack.Common.Extensions;
 

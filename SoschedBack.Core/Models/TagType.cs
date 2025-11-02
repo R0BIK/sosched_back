@@ -10,5 +10,8 @@ public class TagType : AuditableEntity, ISpaceEntity
     
     public int SpaceEntityId { get; }
     
-    public virtual ICollection<Tag> Tags { get; set; } = null!;
+    public virtual ICollection<Tag> Tags { get; set; } = new List<Tag>();
+    
+    public virtual Space Space { get; set; } = null!;
+
 }

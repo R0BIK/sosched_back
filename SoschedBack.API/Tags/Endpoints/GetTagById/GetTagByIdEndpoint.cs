@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 using SoschedBack.Common;
 using SoschedBack.Common.Extensions;
@@ -17,7 +18,7 @@ public class GetTagByIdEndpoint : IEndpoint
         int Id
     );
 
-    public sealed record Response(
+    private sealed record Response(
         int Id,
         int TagType,
         string Name,
@@ -25,7 +26,7 @@ public class GetTagByIdEndpoint : IEndpoint
         string Color
     );
 
-    private static async Task<IResult> Handle(
+    private static async Task<Ok<Result<Response>>> Handle(
         [AsParameters] Request request,
         SoschedBackDbContext database,
         CancellationToken ct
@@ -33,16 +34,6 @@ public class GetTagByIdEndpoint : IEndpoint
     {
         var tag = await database.Tags
             .FirstOrDefaultAsync(i => i.Id == request.Id, ct);
-
-        if (tag == null)
-        {
-            var error = Error.From(
-                $"Tag with id {request.Id} does not exist.",
-                "ENTITY_DOES_NOT_EXISTS"
-            );
-            
-            return Results.NotFound(error);
-        }
 
         var response = new Response(
             tag.Id,
@@ -54,6 +45,6 @@ public class GetTagByIdEndpoint : IEndpoint
         
         var result = Result.Success(response);
         
-        return Results.Ok(result);
+        return TypedResults.Ok(result);
     }
 }

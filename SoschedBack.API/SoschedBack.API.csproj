@@ -36,7 +36,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Auth\" />
       <Folder Include="Events\" />
       <Folder Include="EventTypes\" />
       <Folder Include="Permissions\" />

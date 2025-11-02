@@ -75,6 +75,9 @@ namespace SoschedBack.Storage.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<int>("SpaceId")
+                        .HasColumnType("integer");
+
                     b.Property<DateTimeOffset>("UpdatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
@@ -87,6 +90,8 @@ namespace SoschedBack.Storage.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("EventTypeId");
+
+                    b.HasIndex("SpaceId");
 
                     b.HasIndex("UserId");
 
@@ -108,6 +113,10 @@ namespace SoschedBack.Storage.Migrations
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("EventId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("EventToUsers");
                 });
@@ -198,6 +207,10 @@ namespace SoschedBack.Storage.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("PermissionId");
+
+                    b.HasIndex("RoleId");
+
                     b.ToTable("PermissionToRoles");
                 });
 
@@ -223,6 +236,9 @@ namespace SoschedBack.Storage.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<int>("SpaceId")
+                        .HasColumnType("integer");
+
                     b.Property<DateTimeOffset>("UpdatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
@@ -231,7 +247,62 @@ namespace SoschedBack.Storage.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("SpaceId");
+
                     b.ToTable("Roles");
+                });
+
+            modelBuilder.Entity("SoschedBack.Core.Models.Space", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Address")
+                        .HasColumnType("text");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("deleted_at");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Domain")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Email")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Image")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.Property<string>("Website")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Space");
                 });
 
             modelBuilder.Entity("SoschedBack.Core.Models.Tag", b =>
@@ -264,7 +335,7 @@ namespace SoschedBack.Storage.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int?>("TagToUserId")
+                    b.Property<int>("SpaceId")
                         .HasColumnType("integer");
 
                     b.Property<int>("TagTypeId")
@@ -278,7 +349,7 @@ namespace SoschedBack.Storage.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("TagToUserId");
+                    b.HasIndex("SpaceId");
 
                     b.HasIndex("TagTypeId");
 
@@ -300,6 +371,10 @@ namespace SoschedBack.Storage.Migrations
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("TagId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("TagToUsers");
                 });
@@ -326,6 +401,9 @@ namespace SoschedBack.Storage.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<int>("SpaceId")
+                        .HasColumnType("integer");
+
                     b.Property<DateTimeOffset>("UpdatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
@@ -333,6 +411,8 @@ namespace SoschedBack.Storage.Migrations
                         .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("SpaceId");
 
                     b.ToTable("TagTypes");
                 });
@@ -381,7 +461,10 @@ namespace SoschedBack.Storage.Migrations
                     b.Property<string>("Patronymic")
                         .HasColumnType("text");
 
-                    b.Property<int?>("TagToUserId")
+                    b.Property<int>("RoleId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("SpaceId")
                         .HasColumnType("integer");
 
                     b.Property<DateTimeOffset>("UpdatedAt")
@@ -392,7 +475,9 @@ namespace SoschedBack.Storage.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("TagToUserId");
+                    b.HasIndex("RoleId");
+
+                    b.HasIndex("SpaceId");
 
                     b.ToTable("Users");
                 });
@@ -400,8 +485,14 @@ namespace SoschedBack.Storage.Migrations
             modelBuilder.Entity("SoschedBack.Core.Models.Event", b =>
                 {
                     b.HasOne("SoschedBack.Core.Models.EventType", "EventType")
-                        .WithMany()
+                        .WithMany("Events")
                         .HasForeignKey("EventTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SoschedBack.Core.Models.Space", "Space")
+                        .WithMany("Events")
+                        .HasForeignKey("SpaceId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -413,14 +504,67 @@ namespace SoschedBack.Storage.Migrations
 
                     b.Navigation("EventType");
 
+                    b.Navigation("Space");
+
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("SoschedBack.Core.Models.EventToUser", b =>
+                {
+                    b.HasOne("SoschedBack.Core.Models.Event", "Event")
+                        .WithMany("EventToUsers")
+                        .HasForeignKey("EventId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SoschedBack.Core.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Event");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("SoschedBack.Core.Models.PermissionToRole", b =>
+                {
+                    b.HasOne("SoschedBack.Core.Models.Permission", "Permission")
+                        .WithMany("PermissionToRoles")
+                        .HasForeignKey("PermissionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SoschedBack.Core.Models.Role", "Role")
+                        .WithMany("PermissionToRoles")
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Permission");
+
+                    b.Navigation("Role");
+                });
+
+            modelBuilder.Entity("SoschedBack.Core.Models.Role", b =>
+                {
+                    b.HasOne("SoschedBack.Core.Models.Space", "Space")
+                        .WithMany("Roles")
+                        .HasForeignKey("SpaceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Space");
                 });
 
             modelBuilder.Entity("SoschedBack.Core.Models.Tag", b =>
                 {
-                    b.HasOne("SoschedBack.Core.Models.TagToUser", null)
-                        .WithMany("Tag")
-                        .HasForeignKey("TagToUserId");
+                    b.HasOne("SoschedBack.Core.Models.Space", "Space")
+                        .WithMany("Tags")
+                        .HasForeignKey("SpaceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("SoschedBack.Core.Models.TagType", "TagType")
                         .WithMany("Tags")
@@ -428,21 +572,98 @@ namespace SoschedBack.Storage.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("TagType");
-                });
+                    b.Navigation("Space");
 
-            modelBuilder.Entity("SoschedBack.Core.Models.User", b =>
-                {
-                    b.HasOne("SoschedBack.Core.Models.TagToUser", null)
-                        .WithMany("User")
-                        .HasForeignKey("TagToUserId");
+                    b.Navigation("TagType");
                 });
 
             modelBuilder.Entity("SoschedBack.Core.Models.TagToUser", b =>
                 {
+                    b.HasOne("SoschedBack.Core.Models.Tag", "Tag")
+                        .WithMany("TagToUsers")
+                        .HasForeignKey("TagId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SoschedBack.Core.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("Tag");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("SoschedBack.Core.Models.TagType", b =>
+                {
+                    b.HasOne("SoschedBack.Core.Models.Space", "Space")
+                        .WithMany("TagTypes")
+                        .HasForeignKey("SpaceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Space");
+                });
+
+            modelBuilder.Entity("SoschedBack.Core.Models.User", b =>
+                {
+                    b.HasOne("SoschedBack.Core.Models.Role", "Role")
+                        .WithMany("Users")
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SoschedBack.Core.Models.Space", "Space")
+                        .WithMany("Users")
+                        .HasForeignKey("SpaceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Role");
+
+                    b.Navigation("Space");
+                });
+
+            modelBuilder.Entity("SoschedBack.Core.Models.Event", b =>
+                {
+                    b.Navigation("EventToUsers");
+                });
+
+            modelBuilder.Entity("SoschedBack.Core.Models.EventType", b =>
+                {
+                    b.Navigation("Events");
+                });
+
+            modelBuilder.Entity("SoschedBack.Core.Models.Permission", b =>
+                {
+                    b.Navigation("PermissionToRoles");
+                });
+
+            modelBuilder.Entity("SoschedBack.Core.Models.Role", b =>
+                {
+                    b.Navigation("PermissionToRoles");
+
+                    b.Navigation("Users");
+                });
+
+            modelBuilder.Entity("SoschedBack.Core.Models.Space", b =>
+                {
+                    b.Navigation("Events");
+
+                    b.Navigation("Roles");
+
+                    b.Navigation("TagTypes");
+
+                    b.Navigation("Tags");
+
+                    b.Navigation("Users");
+                });
+
+            modelBuilder.Entity("SoschedBack.Core.Models.Tag", b =>
+                {
+                    b.Navigation("TagToUsers");
                 });
 
             modelBuilder.Entity("SoschedBack.Core.Models.TagType", b =>

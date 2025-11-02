@@ -1,5 +1,9 @@
 using FluentValidation;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using SoschedBack.Auth.Authentication;
+using SoschedBack.Core.Common.Interfaces.Services;
+using SoschedBack.Core.Models;
 using SoschedBack.Storage;
 
 namespace SoschedBack;
@@ -10,6 +14,12 @@ public static class ConfigureServices
     {
         builder.AddSwagger();
         builder.AddDatabase();
+        builder.AddTokenHandlerAuthentication();
+        
+        builder.Services.AddHttpContextAccessor();
+
+        builder.Services.AddScoped<ITokenHandlerService, TokenHandlerService>();
+        builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
         
         // builder.AddJwtAuthentication();
         // builder.AddAuthorization();

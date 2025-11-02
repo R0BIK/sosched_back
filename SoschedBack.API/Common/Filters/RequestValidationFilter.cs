@@ -1,6 +1,6 @@
 using FluentValidation;
 
-namespace SoschedBack.Common.Filter;
+namespace SoschedBack.Common.Filters;
 
 public class RequestValidationFilter<TRequest>(
     ILogger<RequestValidationFilter<TRequest>> logger,

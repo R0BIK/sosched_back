@@ -1,3 +1,4 @@
+using SoschedBack.Auth.Endpoints.Login;
 using SoschedBack.Common;
 using SoschedBack.Roles.Endpoints.CreateRoles;
 using SoschedBack.Roles.Endpoints.GetRoleById;
@@ -18,6 +19,15 @@ public static class Endpoints
         app.MapTagEndpoints();
         app.MapTagTypeEndpoints();
         app.MapRoleEndpoints();
+        app.MapAuthenticationEndpoints();
+    }
+    
+    private static void MapAuthenticationEndpoints(this IEndpointRouteBuilder app)
+    {
+        var endpoints = app.MapGroup("/auth")
+            .WithTags("Auth");
+
+        endpoints.MapEndpoint<LoginEndpoint>();
     }
     
     public static void MapRoleEndpoints(this IEndpointRouteBuilder app)

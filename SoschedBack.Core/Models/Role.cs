@@ -9,4 +9,10 @@ public class Role : AuditableEntity, ISpaceEntity
     public string Name { get; set; } = null!;
     
     public int SpaceEntityId { get; }
+    
+    public virtual ICollection<PermissionToRole> PermissionToRoles { get; set; } = new List<PermissionToRole>();
+    
+    public virtual Space Space { get; set; } = null!;
+    
+    public virtual ICollection<User> Users { get; set; } = new List<User>();
 }

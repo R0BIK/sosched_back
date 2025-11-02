@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Http.HttpResults;
 using SoschedBack.Common;
 using SoschedBack.Common.Extensions;
 using SoschedBack.Core.Common.UnifiedResponse;
@@ -28,7 +29,7 @@ public class CreateTagsEndpoint : IEndpoint
         int TagType
     );
 
-    private static async Task<IResult> Handle(
+    private static async Task<Ok<Result<Response>>> Handle(
         Request request,
         SoschedBackDbContext database,
         CancellationToken cancellationToken
@@ -49,6 +50,6 @@ public class CreateTagsEndpoint : IEndpoint
         
         var result = Result.Success(response);
         
-        return Results.Ok(result);
+        return TypedResults.Ok(result);
     }
 }

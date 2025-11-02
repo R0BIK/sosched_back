@@ -33,4 +33,9 @@ public class Event : AuditableEntity, ISpaceEntity
     public virtual EventType EventType { get; set; } = null!;
     
     public virtual User User { get; set; } = null!;
+    
+    public virtual ICollection<EventToUser> EventToUsers { get; set; } = new List<EventToUser>();
+    
+    public virtual Space Space { get; set; } = null!;
+
 }

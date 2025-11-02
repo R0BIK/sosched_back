@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 using SoschedBack.Common;
 using SoschedBack.Common.Extensions;
@@ -23,7 +24,7 @@ public class CreateTagTypesEndpoint : IEndpoint
         string Name
     );
 
-    private static async Task<IResult> Handle(
+    private static async Task<Ok<Result<Response>>> Handle(
         Request request,
         SoschedBackDbContext database,
         CancellationToken cancellationToken
@@ -41,6 +42,6 @@ public class CreateTagTypesEndpoint : IEndpoint
         
         var result = Result.Success(response);
         
-        return Results.Ok(result);
+        return TypedResults.Ok(result);
     }
 }

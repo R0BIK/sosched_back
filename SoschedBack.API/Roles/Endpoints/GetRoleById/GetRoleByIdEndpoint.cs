@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 using SoschedBack.Common;
 using SoschedBack.Common.Extensions;
@@ -9,7 +10,7 @@ namespace SoschedBack.Roles.Endpoints.GetRoleById;
 public class GetRoleByIdEndpoint : IEndpoint
 {
     public static IEndpointConventionBuilder Map(IEndpointRouteBuilder app) => app
-        .MapGet("/", Handle)
+        .MapGet("/{id}", Handle)
         .WithSummary("Returns a role by id.")
         .WithRequestValidation<Request>();
 
@@ -22,24 +23,15 @@ public class GetRoleByIdEndpoint : IEndpoint
         string Name
     );
 
-    private static async Task<IResult> Handle(
+    private static async Task<Ok<Result<Response>>> Handle(
         [AsParameters] Request request,
         SoschedBackDbContext database,
         CancellationToken ct
     )
     {
         var role = await database.Roles
+            .AsNoTracking()
             .FirstOrDefaultAsync(i => i.Id == request.Id, ct);
-
-        if (role == null)
-        {
-            var error = Error.From(
-                $"Role with id {request.Id} does not exist.",
-                "ENTITY_DOES_NOT_EXISTS"
-            );
-            
-            return Results.NotFound(error);
-        }
 
         var response = new Response(
             role.Id,
@@ -48,6 +40,6 @@ public class GetRoleByIdEndpoint : IEndpoint
         
         var result = Result.Success(response);
         
-        return Results.Ok(result);
+        return TypedResults.Ok(result);
     }
 }

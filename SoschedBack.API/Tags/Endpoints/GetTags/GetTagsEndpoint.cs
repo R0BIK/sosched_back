@@ -1,7 +1,9 @@
 using System.Reflection.Metadata;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 using SoschedBack.Common;
 using SoschedBack.Common.Extensions;
+using SoschedBack.Common.Pagination;
 using SoschedBack.Common.Pagination.PagedRequest;
 using SoschedBack.Core.Common.UnifiedResponse;
 using SoschedBack.Storage;
@@ -22,7 +24,7 @@ public class GetTagsEndpoint : IEndpoint
         bool Descending = false
     ) : IPagedRequest;
 
-    public sealed record Response(
+    private sealed record Response(
         int Id,
         string TagType,
         string Name,
@@ -30,7 +32,7 @@ public class GetTagsEndpoint : IEndpoint
         string Color
     );
 
-    private static async Task<IResult> Handle(
+    private static async Task<Ok<Result<PagedList<Response>>>> Handle(
         [AsParameters] Request request,
         SoschedBackDbContext database,
         CancellationToken ct
@@ -52,6 +54,6 @@ public class GetTagsEndpoint : IEndpoint
         
         var result = Result.Success(tags);
         
-        return Results.Ok(result);
+        return TypedResults.Ok(result);
     }
 }
