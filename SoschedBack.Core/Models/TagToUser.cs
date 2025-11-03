@@ -1,6 +1,8 @@
+using SoschedBack.Core.Models.Interfaces;
+
 namespace SoschedBack.Core.Models;
 
-public class TagToUser
+public class TagToUser : IEntity
 {
     public int Id { get; set; }
     

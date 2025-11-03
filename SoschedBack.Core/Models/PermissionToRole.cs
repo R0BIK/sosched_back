@@ -1,6 +1,8 @@
+using SoschedBack.Core.Models.Interfaces;
+
 namespace SoschedBack.Core.Models;
 
-public class PermissionToRole
+public class PermissionToRole : IEntity
 {
     public int Id { get; set; }
 

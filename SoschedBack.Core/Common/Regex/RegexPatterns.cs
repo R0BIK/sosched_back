@@ -29,6 +29,13 @@ public class RegexPatterns
             new System.Text.RegularExpressions.Regex(@"^(?!\.)[A-Za-z0-9._%+-]+(?<!\.)@[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,}$", RegexOptions.Compiled), 
             100, 
             "Must be a valid email format like user@example.com."),
+        
+        [Pattern.Password] =
+        (   new System.Text.RegularExpressions.Regex(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$", RegexOptions.Compiled),
+            new System.Text.RegularExpressions.Regex(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$", RegexOptions.Compiled),
+            100,
+            "Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, and one digit."
+        ),
 
         [Pattern.PhoneE164] = 
             (new System.Text.RegularExpressions.Regex(@"^\+[1-9]\d{6,14}$", RegexOptions.Compiled),
@@ -55,6 +62,7 @@ public class RegexPatterns
         Name,
         Address,
         Email,
+        Password,
         PhoneE164,
         Domain,
         Description

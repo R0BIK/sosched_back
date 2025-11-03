@@ -2,7 +2,7 @@ using SoschedBack.Core.Models.Interfaces;
 
 namespace SoschedBack.Core.Models;
 
-public class EventType : AuditableEntity
+public class EventType : AuditableEntity, IEntity
 {
     public int Id { get; set; }
     

@@ -3,7 +3,7 @@ using SoschedBack.Core.Models.Interfaces;
 
 namespace SoschedBack.Core.Models;
 
-public class Space : AuditableEntity
+public class Space : AuditableEntity, IEntity
 {
     public int Id { get; set; }
     

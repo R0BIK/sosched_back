@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Http.HttpResults;
 using SoschedBack.Common;
+using SoschedBack.Common.Extensions;
 using SoschedBack.Core.Common.Interfaces.Services;
 using SoschedBack.Core.Common.UnifiedResponse;
 
@@ -9,8 +10,8 @@ public class LoginEndpoint : IEndpoint
 {
     public static IEndpointConventionBuilder Map(IEndpointRouteBuilder app) => app
         .MapPost("/login", Handle)
-        .WithSummary("Logs in user and returns user data");
-    // .WithRequestValidation<Request>();
+        .WithSummary("Logs in user and returns user data")
+        .WithRequestValidation<Request>();
 
     private static async Task<Ok<Result<Response>>> Handle(
         Request request,

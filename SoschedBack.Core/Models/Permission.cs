@@ -2,7 +2,7 @@ using SoschedBack.Core.Models.Interfaces;
 
 namespace SoschedBack.Core.Models;
 
-public class Permission : AuditableEntity
+public class Permission : AuditableEntity, IEntity
 {
     public int Id { get; set; }
     

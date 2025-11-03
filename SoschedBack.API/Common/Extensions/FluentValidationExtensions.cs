@@ -1,5 +1,8 @@
 using FluentValidation;
+using Microsoft.EntityFrameworkCore;
 using SoschedBack.Core.Common.Regex;
+using SoschedBack.Core.Models.Interfaces;
+using SoschedBack.Storage;
 
 namespace SoschedBack.Common.Extensions;
 
@@ -14,6 +17,34 @@ public static class FluentValidationExtensions
         return ruleBuilder
             .Must(x => string.IsNullOrEmpty(x) || InputSanitizer.Sanitize(x) == x);
     }
+
+    public static IRuleBuilderOptions<T, int> MustBeValidEntityId<T, TEntity>(
+        this IRuleBuilder<T, int> ruleBuilder,
+        SoschedBackDbContext dbContext)
+        where TEntity : class, IEntity
+    {
+        return ruleBuilder
+            .MustAsync(async (id, cancellationToken) =>
+            {
+                return await dbContext.Set<TEntity>()
+                    .AnyAsync(i => i.Id == id, cancellationToken);
+            }).WithMessage($"{typeof(TEntity).Name}'s ID is invalid.");
+    }
+    
+    public static IRuleBuilderOptions<T, int> MustBeValidSpaceEntityId<T, TEntity>(
+        this IRuleBuilder<T, int> ruleBuilder,
+        SoschedBackDbContext dbContext,
+        int spaceId)
+        where TEntity : class, ISpaceEntity
+    {
+        return ruleBuilder
+            .MustAsync(async (id, cancellationToken) =>
+            {
+                return await dbContext.Set<TEntity>()
+                    .Where(i => i.SpaceEntityId == spaceId)
+                    .AnyAsync(i => i.Id == id, cancellationToken);
+            }).WithMessage($"{typeof(TEntity).Name}'s ID is invalid.");
+    }
     
     public static IRuleBuilderOptions<T, string> MustBeValidTitle<T>(
         this IRuleBuilder<T, string> ruleBuilder) 
@@ -23,6 +54,16 @@ public static class FluentValidationExtensions
             .MustBeValidString()
             .WithMessage("Title contains invalid characters.")
             .ApplyRegexPattern(RegexPatterns.Pattern.Title);
+    }
+
+    public static IRuleBuilderOptions<T, string> MustBeValidPassword<T>(
+        this IRuleBuilder<T, string> ruleBuilder)
+        where T : class
+    {
+        return ruleBuilder
+            .MustBeValidString()
+            .WithMessage("Password contains invalid characters.")
+            .ApplyRegexPattern(RegexPatterns.Pattern.Password);
     }
     
     public static IRuleBuilderOptions<T, string> MustBeValidName<T>(
@@ -111,36 +152,35 @@ public static class FluentValidationExtensions
             .WithMessage($"SortBy must be one of the following: {string.Join(", ", allowedSortFields)}");
     }
     
-    // public static IRuleBuilderOptions<T, IEnumerable<int>> MustBeValidEntityIdsList<T, TEntity>(
-    //     this IRuleBuilder<T, IEnumerable<int>> ruleBuilder,
-    //     SoschedBackDbContext db)
-    //     where TEntity : class
-    // {
-    //     return ruleBuilder.MustAsync(async (ids, cancellationToken) =>
-    //     {
-    //         var count = await db.Set<TEntity>()
-    //             .CountAsync(e => ids.Contains(e.Id), cancellationToken);
-    //
-    //         return count == ids.Distinct().Count();
-    //     }).WithMessage($"{typeof(TEntity).Name}s Ids are invalid.");
-    // }
+    public static IRuleBuilderOptions<T, IEnumerable<int>> MustBeValidEntityIdsList<T, TEntity>(
+        this IRuleBuilder<T, IEnumerable<int>> ruleBuilder,
+        SoschedBackDbContext db)
+        where TEntity : class, IEntity
+    {
+        return ruleBuilder.MustAsync(async (ids, cancellationToken) =>
+        {
+            var count = await db.Set<TEntity>()
+                .CountAsync(e => ids.Contains(e.Id), cancellationToken);
     
-    //TODO: Space configuration
-    // public static IRuleBuilderOptions<T, IEnumerable<int>> MustBeValidInstitutionEntityIdsList<T, TEntity>(
-    //     this IRuleBuilder<T, IEnumerable<int>> ruleBuilder,
-    //     TimetileDbContext db,
-    //     int institutionId)
-    //     where TEntity : class, IInstitutionEntity
-    // {
-    //     return ruleBuilder.MustAsync(async (ids, cancellationToken) =>
-    //     {
-    //         var count = await db.Set<TEntity>()
-    //             .Where(e => e.InstitutionId == institutionId)
-    //             .CountAsync(e => ids.Contains(e.Id), cancellationToken);
-    //
-    //         return count == ids.Distinct().Count();
-    //     }).WithMessage($"{typeof(TEntity).Name}s Ids are invalid.");
-    // }
+            return count == ids.Distinct().Count();
+        }).WithMessage($"{typeof(TEntity).Name}s Ids are invalid.");
+    }
+    
+    public static IRuleBuilderOptions<T, IEnumerable<int>> MustBeValidSpaceEntityIdsList<T, TEntity>(
+        this IRuleBuilder<T, IEnumerable<int>> ruleBuilder,
+        SoschedBackDbContext db,
+        int spaceId)
+        where TEntity : class, ISpaceEntity
+    {
+        return ruleBuilder.MustAsync(async (ids, cancellationToken) =>
+        {
+            var count = await db.Set<TEntity>()
+                .Where(e => e.SpaceEntityId == spaceId)
+                .CountAsync(e => ids.Contains(e.Id), cancellationToken);
+    
+            return count == ids.Distinct().Count();
+        }).WithMessage($"{typeof(TEntity).Name}s Ids are invalid.");
+    }
     
     public static IRuleBuilderOptions<T, string> ApplyRegexPattern<T>(
         this IRuleBuilder<T, string> ruleBuilder,

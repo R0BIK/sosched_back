@@ -1,6 +1,8 @@
+using SoschedBack.Core.Models.Interfaces;
+
 namespace SoschedBack.Core.Models;
 
-public class EventToUser
+public class EventToUser : IEntity
 {
     public int Id { get; set; }
     

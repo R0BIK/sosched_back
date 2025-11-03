@@ -17,7 +17,7 @@ public class GetTagTypeByIdEndpoint : IEndpoint
         int Id
     );
 
-    public sealed record Response(
+    private sealed record Response(
         int Id,
         string Name
     );
