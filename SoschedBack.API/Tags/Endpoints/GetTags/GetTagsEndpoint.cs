@@ -39,6 +39,7 @@ public class GetTagsEndpoint : IEndpoint
     )
     {
         var tags = await database.Tags
+            .AsNoTracking()
             .ApplySorting(
                 request.SortBy,
                 request.Descending

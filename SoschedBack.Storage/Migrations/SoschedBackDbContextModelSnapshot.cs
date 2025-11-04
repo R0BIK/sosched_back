@@ -260,9 +260,6 @@ namespace SoschedBack.Storage.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Address")
-                        .HasColumnType("text");
-
                     b.Property<DateTimeOffset>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
@@ -273,17 +270,7 @@ namespace SoschedBack.Storage.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("deleted_at");
 
-                    b.Property<string>("Description")
-                        .HasColumnType("text");
-
                     b.Property<string>("Domain")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Email")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Image")
                         .IsRequired()
                         .HasColumnType("text");
 
@@ -297,12 +284,9 @@ namespace SoschedBack.Storage.Migrations
                         .HasColumnName("updated_at")
                         .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
-                    b.Property<string>("Website")
-                        .HasColumnType("text");
-
                     b.HasKey("Id");
 
-                    b.ToTable("Space");
+                    b.ToTable("Spaces");
                 });
 
             modelBuilder.Entity("SoschedBack.Core.Models.Tag", b =>

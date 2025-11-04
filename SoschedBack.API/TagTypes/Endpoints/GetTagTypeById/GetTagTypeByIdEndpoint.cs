@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 using SoschedBack.Common;
 using SoschedBack.Common.Extensions;
@@ -22,13 +23,14 @@ public class GetTagTypeByIdEndpoint : IEndpoint
         string Name
     );
 
-    private static async Task<IResult> Handle(
+    private static async Task<Ok<Result<Response>>> Handle(
         [AsParameters] Request request,
         SoschedBackDbContext database,
         CancellationToken ct
     )
     {
         var tagType = await database.Tags
+            .AsNoTracking()
             .FirstOrDefaultAsync(i => i.Id == request.Id, ct);
 
         var response = new Response(

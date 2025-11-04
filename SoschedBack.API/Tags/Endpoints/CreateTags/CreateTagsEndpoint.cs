@@ -43,7 +43,7 @@ public class CreateTagsEndpoint : IEndpoint
             TagTypeId = request.TagType,
         };
 
-        database.Tags.Add(tag);
+        await database.Tags.AddAsync(tag, cancellationToken);
         await database.SaveChangesAsync(cancellationToken);
         
         var response = new Response(tag.Id, tag.Name, tag.ShortName, tag.Color, tag.TagTypeId);

@@ -2,5 +2,5 @@ namespace SoschedBack.Core.Models.Interfaces;
 
 public interface ISpaceEntity : IEntity
 {
-    public int SpaceEntityId { get; }
+    public int SpaceId { get; }
 }

@@ -41,6 +41,8 @@ public partial class SoschedBackDbContext : DbContext
     
     public DbSet<EventType> EventTypes { get; set; } = null!;
     
+    public DbSet<Space> Spaces { get; set; } = null!;
+    
     public DbSet<TagType> TagTypes { get; set; } = null!;
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)

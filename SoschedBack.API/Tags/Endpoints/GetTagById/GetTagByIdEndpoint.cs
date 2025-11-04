@@ -33,6 +33,7 @@ public class GetTagByIdEndpoint : IEndpoint
     )
     {
         var tag = await database.Tags
+            .AsNoTracking()
             .FirstOrDefaultAsync(i => i.Id == request.Id, ct);
 
         var response = new Response(

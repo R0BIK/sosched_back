@@ -46,13 +46,4 @@ public class CreateRolesEndpoint : IEndpoint
         
         return TypedResults.Ok(result);
     }
-
-    private static async Task<bool> IsRoleNameExists(
-        string name,
-        SoschedBackDbContext database,
-        CancellationToken cancellationToken
-    )
-    {
-        return await database.Roles.AnyAsync(r => r.Name == name, cancellationToken);
-    }
 }

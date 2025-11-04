@@ -14,7 +14,7 @@ public class Tag : AuditableEntity, ISpaceEntity
     
     public string Color { get; set; } = null!;
     
-    public int SpaceEntityId { get; }
+    public int SpaceId { get; set; }
     
     public virtual TagType TagType { get; set; } = null!;
     

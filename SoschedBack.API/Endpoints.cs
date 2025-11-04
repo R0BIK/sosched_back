@@ -1,5 +1,6 @@
 using SoschedBack.Auth.Endpoints.Login;
 using SoschedBack.Common;
+using SoschedBack.Common.Filters;
 using SoschedBack.Roles.Endpoints.CreateRoles;
 using SoschedBack.Roles.Endpoints.GetRoleById;
 using SoschedBack.Roles.Endpoints.GetRoles;
@@ -58,6 +59,14 @@ public static class Endpoints
         endpoints.MapEndpoint<GetTagTypesEndpoint>();
         endpoints.MapEndpoint<GetTagTypeByIdEndpoint>();
         endpoints.MapEndpoint<CreateTagTypesEndpoint>();
+    }
+
+    public static RouteGroupBuilder MapSpaceDomainGroup(this IEndpointRouteBuilder app, string route)
+    {
+        var group = app.MapGroup($"/{{spaceDomain}}{route}")
+            .AddEndpointFilter<ExtractSpaceDomainFilter>();
+        
+        return group;
     }
     
     private static IEndpointConventionBuilder MapEndpoint<TEndpoint>(this IEndpointRouteBuilder app)

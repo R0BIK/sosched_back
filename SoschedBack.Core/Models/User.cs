@@ -20,7 +20,7 @@ public class User : AuditableEntity, ISpaceEntity
     
     public string Password { get; set; } = null!;
     
-    public int SpaceEntityId { get; }
+    public int SpaceId { get; set; }
     
     public virtual Space Space { get; set; } = null!;
     

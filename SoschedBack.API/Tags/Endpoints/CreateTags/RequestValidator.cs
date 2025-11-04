@@ -1,23 +1,31 @@
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using SoschedBack.Common.Extensions;
+using SoschedBack.Common.Http;
+using SoschedBack.Core.Models;
 using SoschedBack.Storage;
 
 namespace SoschedBack.Tags.Endpoints.CreateTags;
 
 public class RequestValidator : AbstractValidator<CreateTagsEndpoint.Request>
 {
-    public RequestValidator(SoschedBackDbContext database)
+    public RequestValidator(SoschedBackDbContext database, ISpaceProvider spaceProvider)
     {
+        var spaceId = spaceProvider.GetSpace();
+        
         RuleFor(x => x.Name)
             .MustBeValidTitle();
         
-        //TODO:Validation for short name
         RuleFor(x => x.ShortName)
             .MustBeValidTitle();
 
         RuleFor(x => x.TagType)
-            .MustBeValidId();
+            .MustBeValidId()
+            .DependentRules(() =>
+            {
+                RuleFor(x => x.TagType)
+                    .MustBeValidSpaceEntityId<CreateTagsEndpoint.Request, TagType>(database, spaceId);
+            });
 
         RuleFor(x => x)
             .CustomAsync(async (request, context, cancellationToken) =>
@@ -29,6 +37,8 @@ public class RequestValidator : AbstractValidator<CreateTagsEndpoint.Request>
                 var tagType = request.TagType;
 
                 var existing = await database.Tags
+                    .AsNoTracking()
+                    .Where(t => t.SpaceId == spaceId)
                     .Where(i =>
                         i.Name == name ||
                         i.ShortName == shortName ||
@@ -40,19 +50,13 @@ public class RequestValidator : AbstractValidator<CreateTagsEndpoint.Request>
                 if (existing is not null)
                 {
                     if (existing.Name == name)
-                    {
                         context.AddFailure($"Tag with name {name} already exists.");
-                    }
 
                     if (existing.ShortName == shortName)
-                    {
                         context.AddFailure($"Tag with short name {shortName} already exists.");
-                    }
 
                     if (existing.Id != tagType)
-                    {
                         context.AddFailure($"Tag type with id {tagType} does not exist.");
-                    }
                 }
             });
     }

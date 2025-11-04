@@ -28,7 +28,7 @@ public class Event : AuditableEntity, ISpaceEntity
     
     public DateTime DateEnd { get; set; }
     
-    public int SpaceEntityId { get; }
+    public int SpaceId { get; set; }
     
     public virtual EventType EventType { get; set; } = null!;
     

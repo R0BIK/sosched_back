@@ -9,16 +9,6 @@ public class Space : AuditableEntity, IEntity
     
     public string Name { get; set; } = null!;
     
-    public string? Description { get; set; }
-    
-    public string Image { get; set; } = null!;
-    
-    public string? Website { get; set; }
-    
-    public string? Email { get; set; }
-    
-    public string? Address { get; set; }
-    
     public string Domain { get; set; } = null!;
     
     public virtual ICollection<User> Users { get; set; } = new List<User>();

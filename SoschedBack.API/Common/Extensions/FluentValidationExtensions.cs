@@ -41,7 +41,7 @@ public static class FluentValidationExtensions
             .MustAsync(async (id, cancellationToken) =>
             {
                 return await dbContext.Set<TEntity>()
-                    .Where(i => i.SpaceEntityId == spaceId)
+                    .Where(i => i.SpaceId == spaceId)
                     .AnyAsync(i => i.Id == id, cancellationToken);
             }).WithMessage($"{typeof(TEntity).Name}'s ID is invalid.");
     }
@@ -175,7 +175,7 @@ public static class FluentValidationExtensions
         return ruleBuilder.MustAsync(async (ids, cancellationToken) =>
         {
             var count = await db.Set<TEntity>()
-                .Where(e => e.SpaceEntityId == spaceId)
+                .Where(e => e.SpaceId == spaceId)
                 .CountAsync(e => ids.Contains(e.Id), cancellationToken);
     
             return count == ids.Distinct().Count();

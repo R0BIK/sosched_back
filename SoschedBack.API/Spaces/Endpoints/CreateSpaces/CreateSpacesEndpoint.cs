@@ -1,50 +1,46 @@
 using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.EntityFrameworkCore;
 using SoschedBack.Common;
 using SoschedBack.Common.Extensions;
-using SoschedBack.Common.Http;
 using SoschedBack.Core.Common.UnifiedResponse;
 using SoschedBack.Core.Models;
 using SoschedBack.Storage;
 
-namespace SoschedBack.TagTypes.Endpoints.CreateTagTypes;
+namespace SoschedBack.Spaces.Endpoints.CreateSpaces;
 
-public class CreateTagTypesEndpoint : IEndpoint
+public class CreateSpacesEndpoint : IEndpoint
 {
     public static IEndpointConventionBuilder Map(IEndpointRouteBuilder app) => app
         .MapPost("/", Handle)
-        .WithSummary("Creates a new tag type.")
+        .WithSummary("Creates a new space")
         .WithRequestValidation<Request>();
     
     public sealed record Request(
         string Name,
-        int SpaceId
+        string Domain
     );
     
     private sealed record Response(
         int Id,
-        string Name
+        string Name,
+        string Domain
     );
 
     private static async Task<Ok<Result<Response>>> Handle(
         Request request,
-        ISpaceProvider spaceProvider,
         SoschedBackDbContext database,
         CancellationToken cancellationToken
     )
     {
-        var spaceId = spaceProvider.GetSpace();
-        
-        var tagType = new TagType
+        var space = new Space
         {
             Name = request.Name.Trim(),
-            SpaceId = spaceId
+            Domain = request.Domain.Trim()
         };
 
-        await database.TagTypes.AddAsync(tagType, cancellationToken);
+        await database.Spaces.AddAsync(space, cancellationToken);
         await database.SaveChangesAsync(cancellationToken);
         
-        var response = new Response(tagType.Id, tagType.Name);
+        var response = new Response(space.Id, space.Name, space.Domain);
         
         var result = Result.Success(response);
         

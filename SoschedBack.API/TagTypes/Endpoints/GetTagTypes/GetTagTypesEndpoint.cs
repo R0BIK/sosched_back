@@ -35,6 +35,7 @@ public class GetTagTypesEndpoint : IEndpoint
     )
     {
         var tagTypes = await database.TagTypes
+            .AsNoTracking()
             .Select(tagType => new Response(
                 tagType.Id,
                 tagType.Name
