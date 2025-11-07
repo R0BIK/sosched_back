@@ -2,8 +2,6 @@ using SoschedBack.Core.Models.Interfaces;
 
 namespace SoschedBack.Core.Models;
 
-//TODO: add foreign key SpaceId
-
 public class Event : AuditableEntity, ISpaceEntity
 {
     public int Id { get; set; }
@@ -12,15 +10,13 @@ public class Event : AuditableEntity, ISpaceEntity
     
     public string Name { get; set; } = null!;
     
-    public int CoordinatorId { get; set; }
+    public int? CoordinatorId { get; set; }
     
     public string? Location { get; set; }
     
     public string? Description { get; set; }
     
     public int CreatorId { get; set; }
-    
-    public int EventDateId { get; set; }
     
     public string Color { get; set; } = null!;
     
@@ -32,9 +28,11 @@ public class Event : AuditableEntity, ISpaceEntity
     
     public virtual EventType EventType { get; set; } = null!;
     
-    public virtual User User { get; set; } = null!;
+    public virtual User Creator { get; set; } = null!;
     
-    public virtual ICollection<EventToUser> EventToUsers { get; set; } = new List<EventToUser>();
+    public virtual User? Coordinator { get; set; }
+    
+    public virtual ICollection<EventToSpaceUser> EventToSpaceUsers { get; set; } = new List<EventToSpaceUser>();
     
     public virtual Space Space { get; set; } = null!;
 

@@ -11,8 +11,6 @@ public class Space : AuditableEntity, IEntity
     
     public string Domain { get; set; } = null!;
     
-    public virtual ICollection<User> Users { get; set; } = new List<User>();
-    
     public virtual ICollection<Tag> Tags { get; set; } = new List<Tag>();
     
     public virtual ICollection<Role> Roles { get; set; } = new List<Role>();
@@ -20,4 +18,6 @@ public class Space : AuditableEntity, IEntity
     public virtual ICollection<Event> Events { get; set; } = new List<Event>();
     
     public virtual ICollection<TagType> TagTypes { get; set; } = new List<TagType>();
+    
+    public virtual ICollection<SpaceUser> SpaceUsers { get; set; } = new List<SpaceUser>();
 }

@@ -14,5 +14,5 @@ public class Role : AuditableEntity, ISpaceEntity
     
     public virtual Space Space { get; set; } = null!;
     
-    public virtual ICollection<User> Users { get; set; } = new List<User>();
+    public virtual ICollection<SpaceUser> SpaceUsers { get; set; } = new List<SpaceUser>();
 }

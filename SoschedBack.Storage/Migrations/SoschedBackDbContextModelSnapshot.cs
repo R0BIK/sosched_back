@@ -37,7 +37,7 @@ namespace SoschedBack.Storage.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int>("CoordinatorId")
+                    b.Property<int?>("CoordinatorId")
                         .HasColumnType("integer");
 
                     b.Property<DateTimeOffset>("CreatedAt")
@@ -62,9 +62,6 @@ namespace SoschedBack.Storage.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("text");
 
-                    b.Property<int>("EventDateId")
-                        .HasColumnType("integer");
-
                     b.Property<int>("EventTypeId")
                         .HasColumnType("integer");
 
@@ -84,21 +81,20 @@ namespace SoschedBack.Storage.Migrations
                         .HasColumnName("updated_at")
                         .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("integer");
-
                     b.HasKey("Id");
+
+                    b.HasIndex("CoordinatorId");
+
+                    b.HasIndex("CreatorId");
 
                     b.HasIndex("EventTypeId");
 
                     b.HasIndex("SpaceId");
 
-                    b.HasIndex("UserId");
-
                     b.ToTable("Events");
                 });
 
-            modelBuilder.Entity("SoschedBack.Core.Models.EventToUser", b =>
+            modelBuilder.Entity("SoschedBack.Core.Models.EventToSpaceUser", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -118,7 +114,7 @@ namespace SoschedBack.Storage.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("EventToUsers");
+                    b.ToTable("EventToSpaceUsers");
                 });
 
             modelBuilder.Entity("SoschedBack.Core.Models.EventType", b =>
@@ -289,6 +285,34 @@ namespace SoschedBack.Storage.Migrations
                     b.ToTable("Spaces");
                 });
 
+            modelBuilder.Entity("SoschedBack.Core.Models.SpaceUser", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("RoleId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("SpaceId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RoleId");
+
+                    b.HasIndex("SpaceId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("SpaceUsers");
+                });
+
             modelBuilder.Entity("SoschedBack.Core.Models.Tag", b =>
                 {
                     b.Property<int>("Id")
@@ -445,12 +469,6 @@ namespace SoschedBack.Storage.Migrations
                     b.Property<string>("Patronymic")
                         .HasColumnType("text");
 
-                    b.Property<int>("RoleId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("SpaceId")
-                        .HasColumnType("integer");
-
                     b.Property<DateTimeOffset>("UpdatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
@@ -459,15 +477,21 @@ namespace SoschedBack.Storage.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("RoleId");
-
-                    b.HasIndex("SpaceId");
-
                     b.ToTable("Users");
                 });
 
             modelBuilder.Entity("SoschedBack.Core.Models.Event", b =>
                 {
+                    b.HasOne("SoschedBack.Core.Models.User", "Coordinator")
+                        .WithMany()
+                        .HasForeignKey("CoordinatorId");
+
+                    b.HasOne("SoschedBack.Core.Models.User", "Creator")
+                        .WithMany()
+                        .HasForeignKey("CreatorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("SoschedBack.Core.Models.EventType", "EventType")
                         .WithMany("Events")
                         .HasForeignKey("EventTypeId")
@@ -480,29 +504,25 @@ namespace SoschedBack.Storage.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("SoschedBack.Core.Models.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.Navigation("Coordinator");
+
+                    b.Navigation("Creator");
 
                     b.Navigation("EventType");
 
                     b.Navigation("Space");
-
-                    b.Navigation("User");
                 });
 
-            modelBuilder.Entity("SoschedBack.Core.Models.EventToUser", b =>
+            modelBuilder.Entity("SoschedBack.Core.Models.EventToSpaceUser", b =>
                 {
                     b.HasOne("SoschedBack.Core.Models.Event", "Event")
-                        .WithMany("EventToUsers")
+                        .WithMany("EventToSpaceUsers")
                         .HasForeignKey("EventId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("SoschedBack.Core.Models.User", "User")
-                        .WithMany()
+                        .WithMany("EventToUsers")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -542,6 +562,33 @@ namespace SoschedBack.Storage.Migrations
                     b.Navigation("Space");
                 });
 
+            modelBuilder.Entity("SoschedBack.Core.Models.SpaceUser", b =>
+                {
+                    b.HasOne("SoschedBack.Core.Models.Role", "Role")
+                        .WithMany("SpaceUsers")
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SoschedBack.Core.Models.Space", "Space")
+                        .WithMany("SpaceUsers")
+                        .HasForeignKey("SpaceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SoschedBack.Core.Models.User", "User")
+                        .WithMany("SpaceUsers")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Role");
+
+                    b.Navigation("Space");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("SoschedBack.Core.Models.Tag", b =>
                 {
                     b.HasOne("SoschedBack.Core.Models.Space", "Space")
@@ -570,7 +617,7 @@ namespace SoschedBack.Storage.Migrations
                         .IsRequired();
 
                     b.HasOne("SoschedBack.Core.Models.User", "User")
-                        .WithMany()
+                        .WithMany("TagToUsers")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -591,28 +638,9 @@ namespace SoschedBack.Storage.Migrations
                     b.Navigation("Space");
                 });
 
-            modelBuilder.Entity("SoschedBack.Core.Models.User", b =>
-                {
-                    b.HasOne("SoschedBack.Core.Models.Role", "Role")
-                        .WithMany("Users")
-                        .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("SoschedBack.Core.Models.Space", "Space")
-                        .WithMany("Users")
-                        .HasForeignKey("SpaceId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Role");
-
-                    b.Navigation("Space");
-                });
-
             modelBuilder.Entity("SoschedBack.Core.Models.Event", b =>
                 {
-                    b.Navigation("EventToUsers");
+                    b.Navigation("EventToSpaceUsers");
                 });
 
             modelBuilder.Entity("SoschedBack.Core.Models.EventType", b =>
@@ -629,7 +657,7 @@ namespace SoschedBack.Storage.Migrations
                 {
                     b.Navigation("PermissionToRoles");
 
-                    b.Navigation("Users");
+                    b.Navigation("SpaceUsers");
                 });
 
             modelBuilder.Entity("SoschedBack.Core.Models.Space", b =>
@@ -638,11 +666,11 @@ namespace SoschedBack.Storage.Migrations
 
                     b.Navigation("Roles");
 
+                    b.Navigation("SpaceUsers");
+
                     b.Navigation("TagTypes");
 
                     b.Navigation("Tags");
-
-                    b.Navigation("Users");
                 });
 
             modelBuilder.Entity("SoschedBack.Core.Models.Tag", b =>
@@ -653,6 +681,15 @@ namespace SoschedBack.Storage.Migrations
             modelBuilder.Entity("SoschedBack.Core.Models.TagType", b =>
                 {
                     b.Navigation("Tags");
+                });
+
+            modelBuilder.Entity("SoschedBack.Core.Models.User", b =>
+                {
+                    b.Navigation("EventToUsers");
+
+                    b.Navigation("SpaceUsers");
+
+                    b.Navigation("TagToUsers");
                 });
 #pragma warning restore 612, 618
         }

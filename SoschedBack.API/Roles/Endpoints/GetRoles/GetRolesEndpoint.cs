@@ -7,6 +7,8 @@ using SoschedBack.Common.Extensions;
 using SoschedBack.Common.Http;
 using SoschedBack.Common.Pagination;
 using SoschedBack.Common.Pagination.PagedRequest;
+using SoschedBack.Common.Requests;
+using SoschedBack.Common.Responses;
 using SoschedBack.Core.Common.UnifiedResponse;
 using SoschedBack.Storage;
 
@@ -24,12 +26,13 @@ public class GetRolesEndpoint : IEndpoint
         int? PageSize = 10,
         string? SortBy = null,
         bool Descending = false
-    ) : IPagedRequest;
+    ) : IPagedRequest, ISortRequest;
 
-    public sealed record Response(
+    private sealed record Response(
         int Id,
-        string Name
-    );
+        string Name,
+        int UsersCount
+    ) : IUsersCountResponse;
 
     private static async Task<Ok<Result<PagedList<Response>>>> Handle(
         [AsParameters] Request request,
@@ -40,20 +43,36 @@ public class GetRolesEndpoint : IEndpoint
     {
         var spaceId = spaceProvider.GetSpace();
         
-        var roles = await database.Roles
+        var rolesQuery = BuildSortedUsersCountQuery(request, spaceId, database);
+        
+        var roles = await rolesQuery
             .AsNoTracking()
-            .ApplySorting(
-                request.SortBy,
-                request.Descending
-            )
             .Select(role => new Response(
                 role.Id,
-                role.Name
+                role.Name,
+                role.UsersCount
             ))
             .ToPagedListAsync(request, ct);
         
         var result = Result.Success(roles);
         
         return TypedResults.Ok(result);
+    }
+    
+    private static IQueryable<Response> BuildSortedUsersCountQuery(
+        Request request, 
+        int spaceId,
+        SoschedBackDbContext dbContext)
+    {
+        var query = dbContext.Roles
+            .AsNoTracking()
+            .Where(t => t.SpaceId == spaceId)
+            .Select(role => new Response(
+                role.Id,
+                role.Name,
+                dbContext.SpaceUsers.Count(tu => tu.RoleId == role.Id)
+            ));
+
+        return query.ApplySorting(request.SortBy, request.Descending);
     }
 }

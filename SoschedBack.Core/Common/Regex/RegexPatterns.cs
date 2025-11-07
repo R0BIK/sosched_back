@@ -50,8 +50,8 @@ public class RegexPatterns
             "Domain must be valid and support international formats like sub.domain.com."),
 
         [Pattern.Description] = 
-            (new System.Text.RegularExpressions.Regex(@"^[\p{L}\d\s.,!?]+$", RegexOptions.Compiled),
-            new System.Text.RegularExpressions.Regex(@"^[[:alpha:]\d\s.,!?]+$", RegexOptions.Compiled), 
+            (new System.Text.RegularExpressions.Regex(@"^[\p{L}\d\s.,!?]*$", RegexOptions.Compiled),
+            new System.Text.RegularExpressions.Regex(@"^[[:alpha:]\d\s.,!?]*$", RegexOptions.Compiled), 
             250, 
             "Descriptions may include letters, numbers, spaces, and punctuation like .,!?"),
     };

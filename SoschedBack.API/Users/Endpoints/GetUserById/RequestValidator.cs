@@ -1,4 +1,5 @@
 using FluentValidation;
+using Microsoft.EntityFrameworkCore;
 using SoschedBack.Common.Extensions;
 using SoschedBack.Common.Http;
 using SoschedBack.Core.Models;
@@ -17,7 +18,17 @@ public class RequestValidator : AbstractValidator<GetUserByIdEndpoint.Request>
             .DependentRules(() =>
             {
                 RuleFor(x => x.Id)
-                    .MustBeValidSpaceEntityId<GetUserByIdEndpoint.Request, User>(db, spaceId);
+                    .MustBeValidEntityId<GetUserByIdEndpoint.Request, User>(db)
+                    .DependentRules(() =>
+                    {
+                        RuleFor(x => x.Id)
+                            .MustAsync(async (id, cancellationToken) =>
+                            {
+                                return await db.SpaceUsers
+                                    .AnyAsync(x => x.UserId == id && x.SpaceId == spaceId, cancellationToken);
+                            })
+                            .WithMessage((_, id) => $"User with id {id} not found in current space.");
+                    });
             });
     }
 }

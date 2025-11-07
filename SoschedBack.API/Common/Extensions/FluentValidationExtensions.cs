@@ -1,5 +1,6 @@
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
+using SoschedBack.Common.Constants;
 using SoschedBack.Core.Common.Regex;
 using SoschedBack.Core.Models.Interfaces;
 using SoschedBack.Storage;
@@ -12,6 +13,14 @@ public static class FluentValidationExtensions
     //TODO: Check validation for my project
     public static IRuleBuilderOptions<T, string> MustBeValidString<T>(
         this IRuleBuilder<T, string> ruleBuilder)
+        where T : class
+    {
+        return ruleBuilder
+            .Must(x => string.IsNullOrEmpty(x) || InputSanitizer.Sanitize(x) == x);
+    }
+    
+    public static IRuleBuilderOptions<T, string?> MustBeValidOptionalString<T>(
+        this IRuleBuilder<T, string?> ruleBuilder)
         where T : class
     {
         return ruleBuilder
@@ -46,6 +55,54 @@ public static class FluentValidationExtensions
             }).WithMessage($"{typeof(TEntity).Name}'s ID is invalid.");
     }
     
+    public static IRuleBuilderOptions<T, int?> MustBeValidOptionalSpaceEntityId<T, TEntity>(
+        this IRuleBuilder<T, int?> ruleBuilder,
+        SoschedBackDbContext dbContext,
+        int spaceId)
+        where TEntity : class, ISpaceEntity
+    {
+        return ruleBuilder
+            .MustAsync(async (id, cancellationToken) =>
+            {
+                if (!id.HasValue)
+                    return true;
+
+                return await dbContext.Set<TEntity>()
+                    .Where(i => i.SpaceId == spaceId)
+                    .AnyAsync(i => i.Id == id.Value, cancellationToken);
+            })
+            .WithMessage($"{typeof(TEntity).Name}'s ID is invalid.");
+    }
+    
+    public static IRuleBuilderOptions<T, DateTime> MustBeValidDate<T>(
+        this IRuleBuilder<T, DateTime> ruleBuilder) 
+        where T : class
+    {
+        return ruleBuilder
+            .GreaterThanOrEqualTo(DateTime.UtcNow)
+            .WithMessage("Date cannot be in the past.")
+            .LessThanOrEqualTo(_ => DateTime.UtcNow.AddYears(2))
+            .WithMessage("DateEnd cannot be later than 2 years from now.");
+    }
+    
+    public static IRuleBuilderOptions<T, string> MustBeValidRepeatType<T>(
+        this IRuleBuilder<T, string> ruleBuilder) 
+        where T : class
+    {
+        var validTypes = new[]
+        {
+            RepeatConstants.Day.RepeatType,
+            RepeatConstants.Week.RepeatType,
+            RepeatConstants.Month.RepeatType
+        };
+
+        
+        return ruleBuilder
+            .MustBeValidString()
+            .Must(type => validTypes.Contains(type))
+            .WithMessage($"RepeatType must be one of the following: {string.Join(", ", validTypes)}");
+    }
+    
     public static IRuleBuilderOptions<T, string> MustBeValidTitle<T>(
         this IRuleBuilder<T, string> ruleBuilder) 
         where T : class
@@ -54,6 +111,26 @@ public static class FluentValidationExtensions
             .MustBeValidString()
             .WithMessage("Title contains invalid characters.")
             .ApplyRegexPattern(RegexPatterns.Pattern.Title);
+    }
+    
+    public static IRuleBuilderOptions<T, string?> MustBeValidOptionalDescription<T>(
+        this IRuleBuilder<T, string?> ruleBuilder)
+        where T : class
+    {
+        return ruleBuilder
+            .MustBeValidOptionalString()
+            .WithMessage("Description contains invalid characters.")
+            .ApplyRegexPatternForOptional(RegexPatterns.Pattern.Description);
+    }
+    
+    public static IRuleBuilderOptions<T, string> MustBeValidEmail<T>(
+        this IRuleBuilder<T, string> ruleBuilder)
+        where T : class
+    {
+        return ruleBuilder
+            .MustBeValidString()
+            .WithMessage("Email contains invalid characters.")
+            .ApplyRegexPattern(RegexPatterns.Pattern.Email);
     }
 
     public static IRuleBuilderOptions<T, string> MustBeValidPassword<T>(
@@ -76,16 +153,6 @@ public static class FluentValidationExtensions
             .ApplyRegexPattern(RegexPatterns.Pattern.Name);
     }
     
-    public static IRuleBuilderOptions<T, string> MustBeValidDescription<T>(
-        this IRuleBuilder<T, string> ruleBuilder)
-        where T : class
-    {
-        return ruleBuilder
-            .MustBeValidString()
-            .WithMessage("Description contains invalid characters.")
-            .ApplyRegexPattern(RegexPatterns.Pattern.Description);
-    }
-    
     public static IRuleBuilderOptions<T, string> MustBeValidAddress<T>(
         this IRuleBuilder<T, string> ruleBuilder)
         where T : class
@@ -105,16 +172,6 @@ public static class FluentValidationExtensions
             .WithMessage("PhoneE164 contains invalid characters.")
             .ApplyRegexPattern(RegexPatterns.Pattern.PhoneE164);
     }
-
-    public static IRuleBuilderOptions<T, string> MustBeValidEmail<T>(
-        this IRuleBuilder<T, string> ruleBuilder)
-        where T : class
-    {
-        return ruleBuilder
-            .MustBeValidString()
-            .WithMessage("Email contains invalid characters.")
-            .ApplyRegexPattern(RegexPatterns.Pattern.Email);
-    }
     
     public static IRuleBuilderOptions<T, int> MustBeValidId<T>(
         this IRuleBuilder<T, int> ruleBuilder)
@@ -127,17 +184,26 @@ public static class FluentValidationExtensions
             .WithMessage("Id must be greater or equal to 1");
     }
     
-    public static IRuleBuilderOptions<T, IEnumerable<int>> MustBeValidListOfIds<T>(
-        this IRuleBuilder<T, IEnumerable<int>> ruleBuilder)
+    public static IRuleBuilderOptions<T, int?> MustBeValidOptionalId<T>(
+        this IRuleBuilder<T, int?> ruleBuilder)
+        where T : class
     {
         return ruleBuilder
-            .NotEmpty()
-            .WithMessage("Ids must be provided and contain at least one item.")
-            .ForEach(id =>
-                id.GreaterThanOrEqualTo(1)
-                    .WithMessage("Ids must be greater or equal to 1.")
-            );
+            .Must(id => id == null || id >= 1)
+            .WithMessage("Id must be greater or equal to 1.");
     }
+    
+    // public static IRuleBuilderOptions<T, IEnumerable<int>> MustBeValidListOfIds<T>(
+    //     this IRuleBuilder<T, IEnumerable<int>> ruleBuilder)
+    // {
+    //     return ruleBuilder
+    //         .NotEmpty()
+    //         .WithMessage("Ids must be provided and contain at least one item.")
+    //         .ForEach(id =>
+    //             id.GreaterThanOrEqualTo(1)
+    //                 .WithMessage("Ids must be greater or equal to 1.")
+    //         );
+    // }
     
     public static IRuleBuilderOptions<T, string?> MustBeValidSortField<T, TEnum>(this IRuleBuilder<T, string?> ruleBuilder)
         where TEnum : Enum
@@ -152,53 +218,61 @@ public static class FluentValidationExtensions
             .WithMessage($"SortBy must be one of the following: {string.Join(", ", allowedSortFields)}");
     }
     
-    public static IRuleBuilderOptions<T, IEnumerable<int>> MustBeValidEntityIdsList<T, TEntity>(
-        this IRuleBuilder<T, IEnumerable<int>> ruleBuilder,
-        SoschedBackDbContext db)
-        where TEntity : class, IEntity
-    {
-        return ruleBuilder.MustAsync(async (ids, cancellationToken) =>
-        {
-            var count = await db.Set<TEntity>()
-                .CountAsync(e => ids.Contains(e.Id), cancellationToken);
-    
-            return count == ids.Distinct().Count();
-        }).WithMessage($"{typeof(TEntity).Name}s Ids are invalid.");
-    }
-    
-    public static IRuleBuilderOptions<T, IEnumerable<int>> MustBeValidSpaceEntityIdsList<T, TEntity>(
-        this IRuleBuilder<T, IEnumerable<int>> ruleBuilder,
-        SoschedBackDbContext db,
-        int spaceId)
-        where TEntity : class, ISpaceEntity
-    {
-        return ruleBuilder.MustAsync(async (ids, cancellationToken) =>
-        {
-            var count = await db.Set<TEntity>()
-                .Where(e => e.SpaceId == spaceId)
-                .CountAsync(e => ids.Contains(e.Id), cancellationToken);
-    
-            return count == ids.Distinct().Count();
-        }).WithMessage($"{typeof(TEntity).Name}s Ids are invalid.");
-    }
+    // public static IRuleBuilderOptions<T, IEnumerable<int>> MustBeValidEntityIdsList<T, TEntity>(
+    //     this IRuleBuilder<T, IEnumerable<int>> ruleBuilder,
+    //     SoschedBackDbContext db)
+    //     where TEntity : class, IEntity
+    // {
+    //     return ruleBuilder.MustAsync(async (ids, cancellationToken) =>
+    //     {
+    //         var count = await db.Set<TEntity>()
+    //             .CountAsync(e => ids.Contains(e.Id), cancellationToken);
+    //
+    //         return count == ids.Distinct().Count();
+    //     }).WithMessage($"{typeof(TEntity).Name}s Ids are invalid.");
+    // }
+    //
+    // public static IRuleBuilderOptions<T, IEnumerable<int>> MustBeValidSpaceEntityIdsList<T, TEntity>(
+    //     this IRuleBuilder<T, IEnumerable<int>> ruleBuilder,
+    //     SoschedBackDbContext db,
+    //     int spaceId)
+    //     where TEntity : class, ISpaceEntity
+    // {
+    //     return ruleBuilder.MustAsync(async (ids, cancellationToken) =>
+    //     {
+    //         var count = await db.Set<TEntity>()
+    //             .Where(e => e.SpaceId == spaceId)
+    //             .CountAsync(e => ids.Contains(e.Id), cancellationToken);
+    //
+    //         return count == ids.Distinct().Count();
+    //     }).WithMessage($"{typeof(TEntity).Name}s Ids are invalid.");
+    // }
     
     public static IRuleBuilderOptions<T, string> ApplyRegexPattern<T>(
         this IRuleBuilder<T, string> ruleBuilder,
-        RegexPatterns.Pattern patternKey,
-        bool allowEmpty = false) where T : class
+        RegexPatterns.Pattern patternKey) where T : class
     {
         var patternInfo = RegexPatterns.Patterns[patternKey];
 
-        var options = allowEmpty
-            ? ruleBuilder
-                .Matches(patternInfo.Pattern).WithMessage(patternInfo.Description)
-                .MaximumLength(patternInfo.MaxLength)
-                .WithMessage($"{patternKey} cannot exceed {patternInfo.MaxLength} characters.")
-            : ruleBuilder
-                .NotEmpty().WithMessage($"{patternKey} is required.")
-                .Matches(patternInfo.Pattern).WithMessage(patternInfo.Description)
-                .MaximumLength(patternInfo.MaxLength)
-                .WithMessage($"{patternKey} cannot exceed {patternInfo.MaxLength} characters.");
+        var options = ruleBuilder
+            .NotEmpty().WithMessage($"{patternKey} is required.")
+            .Matches(patternInfo.Pattern).WithMessage(patternInfo.Description)
+            .MaximumLength(patternInfo.MaxLength)
+            .WithMessage($"{patternKey} cannot exceed {patternInfo.MaxLength} characters.");
+
+        return options;
+    }
+    
+    public static IRuleBuilderOptions<T, string?> ApplyRegexPatternForOptional<T>(
+        this IRuleBuilder<T, string?> ruleBuilder,
+        RegexPatterns.Pattern patternKey) where T : class
+    {
+        var patternInfo = RegexPatterns.Patterns[patternKey];
+
+        var options = ruleBuilder
+            .Matches(patternInfo.Pattern).WithMessage(patternInfo.Description)
+            .MaximumLength(patternInfo.MaxLength)
+            .WithMessage($"{patternKey} cannot exceed {patternInfo.MaxLength} characters.");
 
         return options;
     }

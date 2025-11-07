@@ -35,13 +35,15 @@ public partial class SoschedBackDbContext : DbContext
     
     public DbSet<TagToUser> TagToUsers { get; set; } = null!;
     
-    public DbSet<EventToUser> EventToUsers { get; set; } = null!;
+    public DbSet<EventToSpaceUser> EventToSpaceUsers { get; set; } = null!;
     
     public DbSet<PermissionToRole> PermissionToRoles { get; set; } = null!;
     
     public DbSet<EventType> EventTypes { get; set; } = null!;
     
     public DbSet<Space> Spaces { get; set; } = null!;
+    
+    public DbSet<SpaceUser> SpaceUsers { get; set; } = null!;
     
     public DbSet<TagType> TagTypes { get; set; } = null!;
     

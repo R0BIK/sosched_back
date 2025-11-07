@@ -7,7 +7,6 @@ public class RequestValidator : AbstractValidator<GetTagTypesEndpoint.Request>
 {
     public RequestValidator()
     {
-        RuleFor(x => x.SortBy)
-            .MustBeValidSortField<GetTagTypesEndpoint.Request, AllowedSortField>();
+        
     }
 }

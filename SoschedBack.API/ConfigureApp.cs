@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using SoschedBack.Storage;
+using SoschedBack.Storage.Seeding;
 
 namespace SoschedBack;
 
@@ -35,6 +36,8 @@ public static class ConfigureApp
 
         app.MapEndpoints();
 
+        await SeedDatabase(app);
+
         await app.EnsureDatabaseCreated();
     }
     
@@ -50,6 +53,29 @@ public static class ConfigureApp
         catch (Exception ex)
         {
             Console.WriteLine(ex);
+        }
+    }
+    
+    static async Task SeedDatabase(IHost app)
+    {
+        using var scope = app.Services.CreateScope();
+        var services = scope.ServiceProvider;
+
+        try
+        {
+            var dbContext = services.GetRequiredService<SoschedBackDbContext>();
+            
+            var basePath = Directory.GetCurrentDirectory();
+            var seedFilePath = Path.GetFullPath(
+                Path.Combine(basePath, "../SoschedBack.Storage/Seeding/FakeDB.json")
+            );
+
+            await DataSeeder.SeedAsync(dbContext, seedFilePath);
+        }
+        catch (Exception ex)
+        {
+            var logger = services.GetRequiredService<ILogger<Program>>();
+            logger.LogError(ex, "Произошла ошибка во время сидинга базы данных.");
         }
     }
 }

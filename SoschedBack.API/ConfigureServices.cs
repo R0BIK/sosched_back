@@ -30,8 +30,6 @@ public static class ConfigureServices
         // builder.AddJwtAuthentication();
         // builder.AddAuthorization();
         //
-        // builder.Services.AddValidatorsFromAssembly(typeof(ConfigureServices).Assembly);
-        //
         // builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
         // builder.Services.AddScoped<IUserService, UserService>();
         

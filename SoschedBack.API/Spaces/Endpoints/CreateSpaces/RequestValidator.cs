@@ -27,7 +27,7 @@ public class RequestValidator : AbstractValidator<CreateSpacesEndpoint.Request>
 
                         var exists = await database.Spaces
                             .AsNoTracking()
-                            .AnyAsync(x => x.Name == domain);
+                            .AnyAsync(x => x.Name == domain, cancellationToken);
 
                         return !exists;
                     })

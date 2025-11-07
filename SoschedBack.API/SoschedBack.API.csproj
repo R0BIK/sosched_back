@@ -35,10 +35,4 @@
       <ProjectReference Include="..\SoschedBack.Storage\SoschedBack.Storage.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Events\" />
-      <Folder Include="EventTypes\" />
-      <Folder Include="Permissions\" />
-    </ItemGroup>
-
 </Project>

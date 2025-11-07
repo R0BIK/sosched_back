@@ -26,11 +26,12 @@ public class RequestValidator : AbstractValidator<CreateTagsEndpoint.Request>
                 RuleFor(x => x.TagType)
                     .MustBeValidSpaceEntityId<CreateTagsEndpoint.Request, TagType>(database, spaceId);
             });
+        
 
         RuleFor(x => x)
             .CustomAsync(async (request, context, cancellationToken) =>
             {
-                if (!IsSuccessfullValidation(request)) return;
+                if (!IsSuccessfulValidation(request)) return;
                 
                 var name = request.Name.Trim();
                 var shortName = request.ShortName.Trim();
@@ -61,7 +62,7 @@ public class RequestValidator : AbstractValidator<CreateTagsEndpoint.Request>
             });
     }
 
-    private static bool IsSuccessfullValidation(CreateTagsEndpoint.Request request)
+    private static bool IsSuccessfulValidation(CreateTagsEndpoint.Request request)
     {
         var validator = new InlineValidator<CreateTagsEndpoint.Request>();
 

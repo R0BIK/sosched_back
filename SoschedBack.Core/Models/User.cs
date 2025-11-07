@@ -2,7 +2,7 @@ using SoschedBack.Core.Models.Interfaces;
 
 namespace SoschedBack.Core.Models;
 
-public class User : AuditableEntity, ISpaceEntity
+public class User : AuditableEntity, IEntity
 {
     public int Id { get; set; }
     
@@ -20,9 +20,9 @@ public class User : AuditableEntity, ISpaceEntity
     
     public string Password { get; set; } = null!;
     
-    public int SpaceId { get; set; }
+    public virtual ICollection<SpaceUser> SpaceUsers { get; set; } = new List<SpaceUser>();
     
-    public virtual Space Space { get; set; } = null!;
+    public virtual ICollection<TagToUser> TagToUsers { get; set; } = new List<TagToUser>();
     
-    public virtual Role Role { get; set; } = null!;
+    public virtual ICollection<EventToSpaceUser> EventToUsers { get; set; } = new List<EventToSpaceUser>();
 }

@@ -29,7 +29,7 @@ public class GetTagTypeByIdEndpoint : IEndpoint
         CancellationToken ct
     )
     {
-        var tagType = await database.Tags
+        var tagType = await database.TagTypes
             .AsNoTracking()
             .FirstOrDefaultAsync(i => i.Id == request.Id, ct);
 

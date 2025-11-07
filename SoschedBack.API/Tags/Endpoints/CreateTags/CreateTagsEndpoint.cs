@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Http.HttpResults;
 using SoschedBack.Common;
 using SoschedBack.Common.Extensions;
+using SoschedBack.Common.Http;
 using SoschedBack.Core.Common.UnifiedResponse;
 using SoschedBack.Core.Models;
 using SoschedBack.Storage;
@@ -32,15 +33,19 @@ public class CreateTagsEndpoint : IEndpoint
     private static async Task<Ok<Result<Response>>> Handle(
         Request request,
         SoschedBackDbContext database,
+        ISpaceProvider spaceProvider,
         CancellationToken cancellationToken
     )
     {
+        var spaceId = spaceProvider.GetSpace();
+        
         var tag = new Tag
         {
             Name = request.Name.Trim(),
             ShortName = request.ShortName.Trim(),
             Color = request.Color,
             TagTypeId = request.TagType,
+            SpaceId = spaceId
         };
 
         await database.Tags.AddAsync(tag, cancellationToken);

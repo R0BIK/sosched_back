@@ -1,10 +1,12 @@
-using System.Reflection.Metadata;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 using SoschedBack.Common;
 using SoschedBack.Common.Extensions;
+using SoschedBack.Common.Http;
 using SoschedBack.Common.Pagination;
 using SoschedBack.Common.Pagination.PagedRequest;
+using SoschedBack.Common.Requests;
+using SoschedBack.Common.Responses;
 using SoschedBack.Core.Common.UnifiedResponse;
 using SoschedBack.Storage;
 
@@ -22,34 +24,37 @@ public class GetTagsEndpoint : IEndpoint
         int? PageSize = 10,
         string? SortBy = null,
         bool Descending = false
-    ) : IPagedRequest;
+    ) : IPagedRequest, ISortRequest;
 
     private sealed record Response(
         int Id,
         string TagType,
         string Name,
         string ShortName,
-        string Color
-    );
+        string Color,
+        int UsersCount
+    ) : IUsersCountResponse;
 
     private static async Task<Ok<Result<PagedList<Response>>>> Handle(
         [AsParameters] Request request,
+        ISpaceProvider spaceProvider,
         SoschedBackDbContext database,
         CancellationToken ct
     )
     {
-        var tags = await database.Tags
+        var spaceId = spaceProvider.GetSpace();
+        
+        var tagsQuery = BuildSortedUsersCountQuery(request, spaceId, database);
+        
+        var tags = await tagsQuery
             .AsNoTracking()
-            .ApplySorting(
-                request.SortBy,
-                request.Descending
-            )
             .Select(tag => new Response(
                 tag.Id,
-                tag.TagType.Name,
+                tag.TagType,
                 tag.Name,
                 tag.ShortName,
-                tag.Color
+                tag.Color,
+                tag.UsersCount
             ))
             .ToPagedListAsync(request, ct);
         
@@ -57,4 +62,25 @@ public class GetTagsEndpoint : IEndpoint
         
         return TypedResults.Ok(result);
     }
+
+    private static IQueryable<Response> BuildSortedUsersCountQuery(
+        Request request, 
+        int spaceId,
+        SoschedBackDbContext dbContext)
+    {
+        var query = dbContext.Tags
+            .AsNoTracking()
+            .Where(t => t.SpaceId == spaceId)
+            .Select(tag => new Response(
+                tag.Id,
+                tag.TagType.Name,
+                tag.Name,
+                tag.ShortName,
+                tag.Color,
+                dbContext.TagToUsers.Count(tu => tu.TagId == tag.Id)
+            ));
+
+        return query.ApplySorting(request.SortBy, request.Descending);
+    }
 }
+

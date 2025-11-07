@@ -18,7 +18,7 @@ public class GetUserByIdEndpoint : IEndpoint
         int Id
     );
 
-    public sealed record Response(
+    private sealed record Response(
         int Id,
         string FirstName,
         string LastName,

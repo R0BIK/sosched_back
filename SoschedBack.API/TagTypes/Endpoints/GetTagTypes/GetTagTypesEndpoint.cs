@@ -1,7 +1,9 @@
+using System.Linq.Dynamic.Core;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 using SoschedBack.Common;
 using SoschedBack.Common.Extensions;
+using SoschedBack.Common.Http;
 using SoschedBack.Common.Pagination;
 using SoschedBack.Common.Pagination.PagedRequest;
 using SoschedBack.Core.Common.UnifiedResponse;
@@ -13,14 +15,12 @@ public class GetTagTypesEndpoint : IEndpoint
 {
     public static IEndpointConventionBuilder Map(IEndpointRouteBuilder app) => app
         .MapGet("/", Handle)
-        .WithSummary("Returns a list of tags types.")
+        .WithSummary("Returns a list of tag types.")
         .WithRequestValidation<Request>();
 
     public sealed record Request(
         int? Page = 1,
-        int? PageSize = 10,
-        string? SortBy = null,
-        bool Descending = false
+        int? PageSize = 10
     ) : IPagedRequest;
     
     private sealed record Response(
@@ -30,12 +30,16 @@ public class GetTagTypesEndpoint : IEndpoint
 
     private static async Task<Ok<Result<PagedList<Response>>>> Handle(
         [AsParameters] Request request,
+        ISpaceProvider spaceProvider,
         SoschedBackDbContext database,
         CancellationToken ct
     )
     {
+        var spaceId = spaceProvider.GetSpace();
+        
         var tagTypes = await database.TagTypes
             .AsNoTracking()
+            .Where(i => i.SpaceId == spaceId)
             .Select(tagType => new Response(
                 tagType.Id,
                 tagType.Name

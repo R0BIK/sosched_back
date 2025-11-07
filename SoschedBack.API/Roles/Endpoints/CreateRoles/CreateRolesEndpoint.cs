@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using SoschedBack.Auth.Endpoints.Login;
 using SoschedBack.Common;
 using SoschedBack.Common.Extensions;
+using SoschedBack.Common.Http;
 using SoschedBack.Core.Common.UnifiedResponse;
 using SoschedBack.Core.Models;
 using SoschedBack.Storage;
@@ -28,13 +29,17 @@ public class CreateRolesEndpoint : IEndpoint
 
     private static async Task<Ok<Result<Response>>> Handle(
         Request request,
+        ISpaceProvider spaceProvider,
         SoschedBackDbContext database,
         CancellationToken cancellationToken
     )
     {
+        var spaceId = spaceProvider.GetSpace();
+        
         var role = new Role
         {
-            Name = request.Name.Trim()
+            Name = request.Name.Trim(),
+            SpaceId = spaceId
         };
 
         database.Roles.Add(role);

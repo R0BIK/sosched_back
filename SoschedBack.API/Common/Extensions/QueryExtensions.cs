@@ -9,19 +9,22 @@ public static class QueryExtensions
     public static IQueryable<T> ApplySorting<T>(
         this IQueryable<T> query,
         string? sortBy,
-        bool descending,
-        string? defaultSortField = nameof(AuditableEntity.CreatedAt))
-        where T : AuditableEntity
+        bool descending)
     {
-        if (string.IsNullOrEmpty(sortBy) || !IsValidProperty<T>(sortBy))
-        {
+        var defaultSortField = typeof(AuditableEntity).IsAssignableFrom(typeof(T))
+            ? nameof(AuditableEntity.CreatedAt)
+            : null;
+        
+        if (string.IsNullOrWhiteSpace(sortBy) || !IsValidProperty<T>(sortBy))
             sortBy = defaultSortField;
-        }
+
+        if (string.IsNullOrWhiteSpace(sortBy))
+            return query;
 
         var direction = descending ? "desc" : "asc";
         return query.OrderBy($"{sortBy} {direction}");
     }
-
+    
     private static bool IsValidProperty<T>(string propertyName)
     {
         return typeof(T).GetProperty(propertyName,

@@ -1,13 +1,103 @@
 using FluentValidation;
+using FluentValidation.Validators;
+using Microsoft.EntityFrameworkCore;
+using SoschedBack.Common.Constants;
 using SoschedBack.Common.Extensions;
+using SoschedBack.Common.Filtration;
+using SoschedBack.Common.Http;
+using SoschedBack.Storage;
 
 namespace SoschedBack.Users.Endpoints.GetUsers;
 
 public class RequestValidator : AbstractValidator<GetUsersEndpoint.Request>
 {
-    public RequestValidator()
+    public RequestValidator(SoschedBackDbContext dbContext, ISpaceProvider spaceProvider)
     {
-        RuleFor(x => x.SortBy)
-            .MustBeValidSortField<GetUsersEndpoint.Request, AllowedSortField>();
+        RuleFor(x => x.Filter)
+            .MustBeValidOptionalString()
+            .DependentRules(() =>
+            {
+                RuleFor(x => x.Filter)
+                    .CustomAsync(async (filter, context, ct) =>
+                    {
+                        if (string.IsNullOrWhiteSpace(filter))
+                            return;
+
+                        var spaceId = spaceProvider.GetSpace();
+                
+                        var parsedFilters = FilterParser.Parse(filter);
+                        if (parsedFilters.Count == 0)
+                        {
+                            context.AddFailure("Invalid filter format.");
+                            return;
+                        }
+                        
+                        foreach (var (key, values) in parsedFilters)
+                        {
+                            if (key.Equals(FilterConstants.RoleKey, StringComparison.OrdinalIgnoreCase))
+                            {
+                                await ValidateRolesAsync(values, spaceId, dbContext, context, ct);
+                            }
+                            else if (key.StartsWith(FilterConstants.TagTypePrefix, StringComparison.OrdinalIgnoreCase))
+                            {
+                                await ValidateTagTypeAsync(key, values, spaceId, dbContext, context, ct);
+                            }
+                            else
+                            {
+                                context.AddFailure($"Unknown filter key for this entity: '{key}'.");
+                            }
+                        }
+                    });
+            });
+    }
+    private static async Task ValidateRolesAsync(
+        IEnumerable<string> values,
+        int spaceId,
+        SoschedBackDbContext dbContext,
+        CustomContext context,
+        CancellationToken ct)
+    {
+        var existingRoles = await dbContext.Roles
+            .AsNoTracking()
+            .Where(r => r.SpaceId == spaceId && values.Contains(r.Name))
+            .Select(r => r.Name)
+            .ToListAsync(ct);
+
+        var invalidRoles = values.Except(existingRoles, StringComparer.OrdinalIgnoreCase).ToArray();
+        if (invalidRoles.Length > 0)
+            context.AddFailure($"Invalid roles: {string.Join(", ", invalidRoles)}.");
+    }
+    
+    private static async Task ValidateTagTypeAsync(
+        string key,
+        IEnumerable<string> values,
+        int spaceId,
+        SoschedBackDbContext dbContext,
+        CustomContext context,
+        CancellationToken ct)
+    {
+        var tagTypeName = key[FilterConstants.TagTypePrefix.Length..];
+
+        var tagType = await dbContext.TagTypes
+            .AsNoTracking()
+            .FirstOrDefaultAsync(t => t.Name == tagTypeName && t.SpaceId == spaceId, ct);
+
+        if (tagType is null)
+        {
+            context.AddFailure($"Tag type '{tagTypeName}' does not exist in current space.");
+            return;
+        }
+
+        var existingTags = await dbContext.Tags
+            .AsNoTracking()
+            .Where(t => t.SpaceId == spaceId &&
+                        t.TagTypeId == tagType.Id &&
+                        values.Contains(t.Name))
+            .Select(t => t.Name)
+            .ToListAsync(ct);
+
+        var invalidTags = values.Except(existingTags, StringComparer.OrdinalIgnoreCase).ToArray();
+        if (invalidTags.Length > 0)
+            context.AddFailure($"Invalid tags for '{tagTypeName}': {string.Join(", ", invalidTags)}.");
     }
 }
