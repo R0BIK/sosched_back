@@ -33,7 +33,7 @@ public partial class SoschedBackDbContext : DbContext
     
     public DbSet<Tag> Tags { get; set; } = null!;
     
-    public DbSet<TagToUser> TagToUsers { get; set; } = null!;
+    public DbSet<TagToSpaceUser> TagToSpaceUsers { get; set; } = null!;
     
     public DbSet<EventToSpaceUser> EventToSpaceUsers { get; set; } = null!;
     

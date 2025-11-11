@@ -1,4 +1,7 @@
+using SoschedBack.Auth.Endpoints.CheckAuth;
 using SoschedBack.Auth.Endpoints.Login;
+using SoschedBack.Auth.Endpoints.Logout;
+using SoschedBack.Auth.Endpoints.Register;
 using SoschedBack.Common;
 using SoschedBack.Common.Filters;
 using SoschedBack.Events.Endpoints.CreateEvents;
@@ -73,6 +76,9 @@ public static class Endpoints
             .WithTags("Auth");
 
         endpoints.MapEndpoint<LoginEndpoint>();
+        endpoints.MapEndpoint<Logout>();
+        endpoints.MapEndpoint<RegisterEndpoint>();
+        endpoints.MapEndpoint<CheckAuth>();
     }
     
     private static void MapRoleEndpoints(this IEndpointRouteBuilder app)

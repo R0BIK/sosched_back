@@ -14,6 +14,7 @@ public class SeedDataContainer
     public List<Event> Events { get; set; }
     public List<PermissionToRole> PermissionToRoles { get; set; }
     public List<SpaceUser> SpaceUsers { get; set; }
-    public List<TagToUser> TagToUsers { get; set; }
+    
+    public List<TagToSpaceUser> TagToSpaceUsers { get; set; }
     public List<EventToSpaceUser> EventToSpaceUsers { get; set; }
 }

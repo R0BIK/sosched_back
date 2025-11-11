@@ -18,7 +18,7 @@ public class Tag : AuditableEntity, ISpaceEntity
     
     public virtual TagType TagType { get; set; } = null!;
     
-    public virtual ICollection<TagToUser> TagToUsers { get; set; } = new List<TagToUser>();
+    public virtual ICollection<TagToSpaceUser> TagToSpaceUsers { get; set; } = new List<TagToSpaceUser>();
     
     public virtual Space Space { get; set; } = null!;
 

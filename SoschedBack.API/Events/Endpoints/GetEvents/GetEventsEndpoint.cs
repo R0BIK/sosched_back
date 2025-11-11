@@ -24,9 +24,8 @@ public class GetEventsEndpoint : IEndpoint
         .WithRequestValidation<Request>();
 
     public sealed record Request(
-        DateTime DateFrom,
-        DateTime DateTo,
-        bool SelfUser = true,
+        DateTimeOffset DateFrom,
+        DateTimeOffset DateTo,
         int? Page = 1,
         int? PageSize = 10,
         string? SortBy = null,
@@ -41,8 +40,8 @@ public class GetEventsEndpoint : IEndpoint
         string? Description,
         int CreatorId,
         string Color,
-        DateTime DateStart,
-        DateTime DateEnd,
+        DateTimeOffset DateStart,
+        DateTimeOffset DateEnd,
         int EventTypeId,
         int? CoordinatorId,
         int UsersCount
@@ -65,7 +64,7 @@ public class GetEventsEndpoint : IEndpoint
             .Where(i => i.SpaceId == spaceId)
             .Where(i => i.DateStart >= request.DateFrom && i.DateEnd <= request.DateTo);
 
-        if (!request.SelfUser)
+        if (request.Filter is not null)
         {
             
         }

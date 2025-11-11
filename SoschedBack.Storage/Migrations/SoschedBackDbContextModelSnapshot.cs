@@ -49,10 +49,10 @@ namespace SoschedBack.Storage.Migrations
                     b.Property<int>("CreatorId")
                         .HasColumnType("integer");
 
-                    b.Property<DateTime>("DateEnd")
+                    b.Property<DateTimeOffset>("DateEnd")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<DateTime>("DateStart")
+                    b.Property<DateTimeOffset>("DateStart")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<DateTimeOffset?>("DeletedAt")
@@ -105,14 +105,14 @@ namespace SoschedBack.Storage.Migrations
                     b.Property<int>("EventId")
                         .HasColumnType("integer");
 
-                    b.Property<int>("UserId")
+                    b.Property<int>("SpaceUserId")
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
 
                     b.HasIndex("EventId");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("SpaceUserId");
 
                     b.ToTable("EventToSpaceUsers");
                 });
@@ -364,7 +364,7 @@ namespace SoschedBack.Storage.Migrations
                     b.ToTable("Tags");
                 });
 
-            modelBuilder.Entity("SoschedBack.Core.Models.TagToUser", b =>
+            modelBuilder.Entity("SoschedBack.Core.Models.TagToSpaceUser", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -372,19 +372,19 @@ namespace SoschedBack.Storage.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("TagId")
+                    b.Property<int>("SpaceUserId")
                         .HasColumnType("integer");
 
-                    b.Property<int>("UserId")
+                    b.Property<int>("TagId")
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
 
+                    b.HasIndex("SpaceUserId");
+
                     b.HasIndex("TagId");
 
-                    b.HasIndex("UserId");
-
-                    b.ToTable("TagToUsers");
+                    b.ToTable("TagToSpaceUsers");
                 });
 
             modelBuilder.Entity("SoschedBack.Core.Models.TagType", b =>
@@ -521,15 +521,15 @@ namespace SoschedBack.Storage.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("SoschedBack.Core.Models.User", "User")
+                    b.HasOne("SoschedBack.Core.Models.SpaceUser", "SpaceUser")
                         .WithMany("EventToUsers")
-                        .HasForeignKey("UserId")
+                        .HasForeignKey("SpaceUserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Event");
 
-                    b.Navigation("User");
+                    b.Navigation("SpaceUser");
                 });
 
             modelBuilder.Entity("SoschedBack.Core.Models.PermissionToRole", b =>
@@ -608,23 +608,23 @@ namespace SoschedBack.Storage.Migrations
                     b.Navigation("TagType");
                 });
 
-            modelBuilder.Entity("SoschedBack.Core.Models.TagToUser", b =>
+            modelBuilder.Entity("SoschedBack.Core.Models.TagToSpaceUser", b =>
                 {
+                    b.HasOne("SoschedBack.Core.Models.SpaceUser", "SpaceUser")
+                        .WithMany("TagToSpaceUsers")
+                        .HasForeignKey("SpaceUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("SoschedBack.Core.Models.Tag", "Tag")
-                        .WithMany("TagToUsers")
+                        .WithMany("TagToSpaceUsers")
                         .HasForeignKey("TagId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("SoschedBack.Core.Models.User", "User")
-                        .WithMany("TagToUsers")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.Navigation("SpaceUser");
 
                     b.Navigation("Tag");
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("SoschedBack.Core.Models.TagType", b =>
@@ -673,9 +673,16 @@ namespace SoschedBack.Storage.Migrations
                     b.Navigation("Tags");
                 });
 
+            modelBuilder.Entity("SoschedBack.Core.Models.SpaceUser", b =>
+                {
+                    b.Navigation("EventToUsers");
+
+                    b.Navigation("TagToSpaceUsers");
+                });
+
             modelBuilder.Entity("SoschedBack.Core.Models.Tag", b =>
                 {
-                    b.Navigation("TagToUsers");
+                    b.Navigation("TagToSpaceUsers");
                 });
 
             modelBuilder.Entity("SoschedBack.Core.Models.TagType", b =>
@@ -685,11 +692,7 @@ namespace SoschedBack.Storage.Migrations
 
             modelBuilder.Entity("SoschedBack.Core.Models.User", b =>
                 {
-                    b.Navigation("EventToUsers");
-
                     b.Navigation("SpaceUsers");
-
-                    b.Navigation("TagToUsers");
                 });
 #pragma warning restore 612, 618
         }

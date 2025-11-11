@@ -94,11 +94,14 @@ public class GetUsersEndpoint : IEndpoint
             var tagTypeName = key[FilterConstants.TagTypePrefix.Length..];
             var tagNames = filters.GetValues(key);
 
-            baseQuery = baseQuery.
-                Where(u => 
-                    u.TagToUsers.Any(tu =>
-                    tu.Tag.TagType.Name == tagTypeName &&
-                    tagNames.Contains(tu.Tag.Name)));
+            baseQuery = baseQuery.Where(u =>
+                u.SpaceUsers.Any(su =>
+                    su.TagToSpaceUsers.Any(tsu =>
+                        tsu.Tag.TagType.Name == tagTypeName &&
+                        tagNames.Contains(tsu.Tag.Name)
+                    )
+                )
+            );
         }
 
         return baseQuery;

@@ -20,9 +20,9 @@ public class Event : AuditableEntity, ISpaceEntity
     
     public string Color { get; set; } = null!;
     
-    public DateTime DateStart { get; set; }
+    public DateTimeOffset DateStart { get; set; }
     
-    public DateTime DateEnd { get; set; }
+    public DateTimeOffset DateEnd { get; set; }
     
     public int SpaceId { get; set; }
     

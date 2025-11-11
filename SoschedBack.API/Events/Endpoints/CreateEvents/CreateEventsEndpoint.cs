@@ -20,7 +20,7 @@ public class CreateEventsEndpoint : IEndpoint
     public sealed record RepeatInfo(
         int RepeatNumber,
         string RepeatType,
-        DateTime RepeatEnd
+        DateTimeOffset RepeatEnd
     );
     
     public sealed record Request(
@@ -28,8 +28,8 @@ public class CreateEventsEndpoint : IEndpoint
         string? Location,
         string? Description,
         string Color,
-        DateTime DateStart,
-        DateTime DateEnd,
+        DateTimeOffset DateStart,
+        DateTimeOffset DateEnd,
         int EventTypeId,
         int? CoordinatorId,
         RepeatInfo? RepeatInfo,
@@ -42,8 +42,8 @@ public class CreateEventsEndpoint : IEndpoint
         string? Location,
         string? Description,
         string Color,
-        DateTime DateStart,
-        DateTime DateEnd,
+        DateTimeOffset DateStart,
+        DateTimeOffset DateEnd,
         int EventTypeId,
         int? CoordinatorId,
         int? RepeatsCount
@@ -125,7 +125,7 @@ public class CreateEventsEndpoint : IEndpoint
     {
         var repeats = new List<Event>();
 
-        DateTime currentDate = GetNextDate(myEvent.DateStart, repeatInfo.RepeatNumber, repeatInfo.RepeatType);
+        DateTimeOffset currentDate = GetNextDate(myEvent.DateStart, repeatInfo.RepeatNumber, repeatInfo.RepeatType);
         
         while (currentDate <= repeatInfo.RepeatEnd)
         {
@@ -142,7 +142,7 @@ public class CreateEventsEndpoint : IEndpoint
         return repeats;
     }
 
-    private static DateTime GetNextDate(DateTime date, int number, string type)
+    private static DateTimeOffset GetNextDate(DateTimeOffset date, int number, string type)
     {
         return type switch
         {

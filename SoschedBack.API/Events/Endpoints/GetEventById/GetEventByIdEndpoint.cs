@@ -25,8 +25,8 @@ public class GetEventByIdEndpoint : IEndpoint
         string? Description,
         int CreatorId,
         string Color,
-        DateTime DateStart,
-        DateTime DateEnd,
+        DateTimeOffset DateStart,
+        DateTimeOffset DateEnd,
         int EventTypeId,
         int? CoordinatorId
     );

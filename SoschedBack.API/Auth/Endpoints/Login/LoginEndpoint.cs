@@ -21,7 +21,7 @@ public class LoginEndpoint : IEndpoint
     )
     {
         var result = await tokenHandlerService.Login(
-            request.Login,
+            request.Email,
             request.Password,
             request.RememberMe
         );
@@ -40,10 +40,10 @@ public class LoginEndpoint : IEndpoint
     }
     
     public sealed record Request(
-        string Login,
+        string Email,
         string Password,
         bool RememberMe
     );
     
-    private record Response(int UserId);
+    private record Response(int Id);
 }

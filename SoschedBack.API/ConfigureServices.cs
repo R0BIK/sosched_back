@@ -17,10 +17,10 @@ public static class ConfigureServices
         builder.AddSwagger();
         builder.AddDatabase();
         builder.AddTokenHandlerAuthentication();
+        builder.AddCors();
         
         builder.Services.AddHttpContextAccessor();
 
-        builder.Services.AddScoped<ITokenHandlerService, TokenHandlerService>();
         builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
         builder.Services.AddScoped<IUserProvider, UserProvider>();
         builder.Services.AddScoped<ISpaceProvider, SpaceProvider>();
@@ -59,6 +59,22 @@ public static class ConfigureServices
         builder.Services.AddDbContext<SoschedBackDbContext>(options =>
         {
             options.UseNpgsql(connectionString);
+        });
+    }
+    
+    private static void AddCors(this WebApplicationBuilder builder)
+    {
+        builder.Services.AddCors(options =>
+        {
+            options.AddDefaultPolicy(policy =>
+            {
+                policy
+                    .WithOrigins("http://localhost:5173", "https://localhost:5173")
+                    .AllowCredentials()
+                    .AllowAnyMethod()
+                    .AllowAnyHeader()
+                    .WithExposedHeaders("Content-Disposition", "Content-Type", "Content-Length");
+            });
         });
     }
 }

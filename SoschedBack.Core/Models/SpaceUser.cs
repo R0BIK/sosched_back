@@ -17,4 +17,8 @@ public class SpaceUser : IEntity, ISpaceEntity
     public virtual Space Space { get; set; } = null!;
     
     public virtual Role Role { get; set; } = null!;
+    
+    public virtual ICollection<TagToSpaceUser> TagToSpaceUsers { get; set; } = new List<TagToSpaceUser>();
+    
+    public virtual ICollection<EventToSpaceUser> EventToUsers { get; set; } = new List<EventToSpaceUser>();
 }

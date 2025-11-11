@@ -34,6 +34,8 @@ public static class ConfigureApp
 
         app.UseHttpsRedirection();
 
+        app.UseCors();
+
         app.MapEndpoints();
 
         await SeedDatabase(app);

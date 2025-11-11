@@ -21,8 +21,4 @@ public class User : AuditableEntity, IEntity
     public string Password { get; set; } = null!;
     
     public virtual ICollection<SpaceUser> SpaceUsers { get; set; } = new List<SpaceUser>();
-    
-    public virtual ICollection<TagToUser> TagToUsers { get; set; } = new List<TagToUser>();
-    
-    public virtual ICollection<EventToSpaceUser> EventToUsers { get; set; } = new List<EventToSpaceUser>();
 }

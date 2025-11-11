@@ -77,7 +77,7 @@ public class GetTagsEndpoint : IEndpoint
                 tag.Name,
                 tag.ShortName,
                 tag.Color,
-                dbContext.TagToUsers.Count(tu => tu.TagId == tag.Id)
+                dbContext.TagToSpaceUsers.Count(tu => tu.TagId == tag.Id)
             ));
 
         return query.ApplySorting(request.SortBy, request.Descending);

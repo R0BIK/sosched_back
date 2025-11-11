@@ -10,7 +10,7 @@ public class RequestValidator : AbstractValidator<LoginEndpoint.Request>
 {
     public RequestValidator()
     {
-        RuleFor(x => x.Login)
+        RuleFor(x => x.Email)
             .NotEmpty().WithMessage("Login is required.")
             .MustBeValidEmail();
 

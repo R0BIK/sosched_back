@@ -19,9 +19,9 @@ public static class TokenHandlerAuthenticationExtensions
             {
                 options.Cookie.Name = "sosched-auth";
                 options.Cookie.HttpOnly = true;
-                // options.Cookie.Secure = true;
+                options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
                 //TODO: Change to Strict
-                options.Cookie.SameSite = SameSiteMode.None;
+                options.Cookie.SameSite = SameSiteMode.Strict;
                 options.Cookie.Path = "/"; 
                 options.ExpireTimeSpan = TimeSpan.FromDays(7);
                 options.SlidingExpiration = true;

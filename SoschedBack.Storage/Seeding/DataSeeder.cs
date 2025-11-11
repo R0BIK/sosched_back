@@ -66,12 +66,7 @@ public static class DataSeeder
 
             // Группа 3: Зависят от Групп 1 и 2
             // ВАЖНО: ХЭШИРОВАНИЕ ПАРОЛЕЙ
-            // Здесь вы должны заменить "hashed_password_..." на реальный хэш
-            // Например:
-            // foreach (var user in seedData.Users)
-            // {
-            //     user.Password = YourPasswordHasher.Hash("defaultPass123!");
-            // }
+            // ... (ваш код хэширования)
             if (seedData.Users != null) await context.Users.AddRangeAsync(seedData.Users);
             if (seedData.Tags != null) await context.Tags.AddRangeAsync(seedData.Tags);
             await context.SaveChangesAsync();
@@ -86,7 +81,8 @@ public static class DataSeeder
             await context.SaveChangesAsync();
 
             // Группа 6: Оставшиеся связующие таблицы
-            if (seedData.TagToUsers != null) await context.TagToUsers.AddRangeAsync(seedData.TagToUsers);
+            // <<< ИСПРАВЛЕНО: Должно быть TagToUsers, а не TagToSpaceUsers
+            if (seedData.TagToSpaceUsers != null) await context.TagToSpaceUsers.AddRangeAsync(seedData.TagToSpaceUsers); 
             if (seedData.EventToSpaceUsers != null) await context.EventToSpaceUsers.AddRangeAsync(seedData.EventToSpaceUsers);
             await context.SaveChangesAsync();
 
@@ -119,7 +115,9 @@ public static class DataSeeder
         var tables = new[]
         {
             "Permissions", "EventTypes", "Spaces", "Roles", "PermissionToRoles",
-            "Users", "Events", "EventToUsers", "TagTypes", "Tags", "TagToUsers", "SpaceUsers"
+            "Users", "Events", 
+            "EventToSpaceUsers", // <<< ИСПРАВЛЕНО: Было "EventToUsers"
+            "TagTypes", "Tags", "TagToSpaceUsers", "SpaceUsers"
         };
 
         Console.WriteLine("Сброс sequence-генераторов PostgreSQL...");
@@ -136,8 +134,10 @@ public static class DataSeeder
             catch (Exception ex)
             {
                 // Может возникнуть ошибка, если таблица пуста (MAX(Id) вернет null)
-                // В нашем случае это не страшно, т.к. мы только что вставили данные
+                // Важно: если здесь произойдет ошибка, она вызовет откат транзакции.
                 Console.WriteLine($"Предупреждение при сбросе sequence для '{table}': {ex.Message}");
+                // Выбрасываем ошибку, чтобы транзакция откатилась
+                throw; 
             }
         }
     }
