@@ -57,25 +57,25 @@ public class RequestValidator : AbstractValidator<CreateEventsEndpoint.Request>
             .Must(repeat =>
             {
                 if (repeat is null) return true;
-
                 return repeat.RepeatNumber > 0
                        && !string.IsNullOrWhiteSpace(repeat.RepeatType)
                        && repeat.RepeatEnd != default;
             })
-            .WithMessage("If RepeatInfo is provided, all fields must be filled.")
-            .DependentRules(() =>
-            {
-                RuleFor(x => x.RepeatInfo!.RepeatNumber)
-                    .GreaterThan(0)
-                    .WithMessage("RepeatNumber must be greater than 0.");
+            .WithMessage("If RepeatInfo is provided, all fields must be filled.");
 
-                RuleFor(x => x.RepeatInfo!.RepeatType)
-                    .MustBeValidRepeatType();
+        RuleFor(x => x.RepeatInfo!.RepeatNumber)
+            .GreaterThan(0)
+            .WithMessage("RepeatNumber must be greater than 0.")
+            .When(x => x.RepeatInfo != null);
 
-                RuleFor(x => x.RepeatInfo!.RepeatEnd)
-                    .GreaterThan(x => x.DateEnd)
-                    .WithMessage("RepeatEnd must be after DateEnd.");
-            });
+        RuleFor(x => x.RepeatInfo!.RepeatType)
+            .MustBeValidRepeatType()
+            .When(x => x.RepeatInfo != null);
+
+        RuleFor(x => x.RepeatInfo!.RepeatEnd)
+            .GreaterThan(x => x.DateEnd)
+            .WithMessage("RepeatEnd must be after DateEnd.")
+            .When(x => x.RepeatInfo != null);
 
         RuleFor(x => x)
             .CustomAsync(async (request, context, cancellationToken) =>

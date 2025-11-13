@@ -17,8 +17,7 @@ public class CreateTagTypesEndpoint : IEndpoint
         .WithRequestValidation<Request>();
     
     public sealed record Request(
-        string Name,
-        int SpaceId
+        string Name
     );
     
     private sealed record Response(

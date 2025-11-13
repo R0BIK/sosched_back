@@ -79,6 +79,7 @@ public static class FluentValidationExtensions
         where T : class
     {
         return ruleBuilder
+            .NotNull()
             .GreaterThanOrEqualTo(DateTimeOffset.UtcNow)
             .WithMessage("Date cannot be in the past.")
             .LessThanOrEqualTo(_ => DateTimeOffset.UtcNow.AddYears(2))

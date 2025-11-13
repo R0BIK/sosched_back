@@ -25,7 +25,9 @@ public class GetTagTypesEndpoint : IEndpoint
     
     private sealed record Response(
         int Id,
-        string Name
+        string Name,
+        int TagsCount,
+        int UsersCount
     );
 
     private static async Task<Ok<Result<PagedList<Response>>>> Handle(
@@ -40,9 +42,11 @@ public class GetTagTypesEndpoint : IEndpoint
         var tagTypes = await database.TagTypes
             .AsNoTracking()
             .Where(i => i.SpaceId == spaceId)
-            .Select(tagType => new Response(
-                tagType.Id,
-                tagType.Name
+            .Select(tt => new Response(
+                tt.Id,
+                tt.Name,
+                database.Tags.Count(t => t.SpaceId == spaceId && t.TagTypeId == tt.Id),
+                database.TagToSpaceUsers.Count(tsu => tsu.Tag.TagTypeId == tt.Id)
             ))
             .ToPagedListAsync(request, ct);
         

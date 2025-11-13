@@ -34,8 +34,6 @@ public class GetEventTypesEndpoint : IEndpoint
         CancellationToken ct
     )
     {
-        var spaceId = spaceProvider.GetSpace();
-        
         var eventTypes = await database.EventTypes
             .AsNoTracking()
             .Select(eventType => new Response(

@@ -40,11 +40,12 @@ public static class Endpoints
         app.MapUserEndpoints();
         app.MapEventTypesEndpoints();
         app.MapPermissionsEndpoints();
+        app.MapEventsEndpoints();
     }
     
     private static void MapEventsEndpoints(this IEndpointRouteBuilder app)
     {
-        var endpoints = app.MapGroup("/events")
+        var endpoints = app.MapSpaceDomainGroup("/events")
             .WithTags("Events");
 
         endpoints.MapEndpoint<CreateEventsEndpoint>();
