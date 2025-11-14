@@ -21,6 +21,7 @@ using SoschedBack.Tags.Endpoints.CreateTags;
 using SoschedBack.Tags.Endpoints.GetTagById;
 using SoschedBack.Tags.Endpoints.GetTags;
 using SoschedBack.TagTypes.Endpoints.CreateTagTypes;
+using SoschedBack.TagTypes.Endpoints.DeleteTagType;
 using SoschedBack.TagTypes.Endpoints.GetTagTypeById;
 using SoschedBack.TagTypes.Endpoints.GetTagTypes;
 using SoschedBack.Users.Endpoints.GetUserById;
@@ -130,6 +131,7 @@ public static class Endpoints
         endpoints.MapEndpoint<GetTagTypesEndpoint>();
         endpoints.MapEndpoint<GetTagTypeByIdEndpoint>();
         endpoints.MapEndpoint<CreateTagTypesEndpoint>();
+        endpoints.MapEndpoint<DeleteTagTypeByIdEndpoint>();
     }
 
     private static RouteGroupBuilder MapSpaceDomainGroup(this IEndpointRouteBuilder app, string route)

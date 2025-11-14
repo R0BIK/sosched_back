@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("SoschedBack.Core")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+6878dcaa80aa64a9e2945fd52711951d02ee3bf4")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+a50a7d64a798bc033c6a7531a3d85058a9eb0f1a")]
 [assembly: System.Reflection.AssemblyProductAttribute("SoschedBack.Core")]
 [assembly: System.Reflection.AssemblyTitleAttribute("SoschedBack.Core")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
