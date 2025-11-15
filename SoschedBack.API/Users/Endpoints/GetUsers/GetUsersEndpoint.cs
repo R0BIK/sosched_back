@@ -28,8 +28,15 @@ public class GetUsersEndpoint : IEndpoint
         int? PageSize = 10,
         string? SortBy = null,
         bool Descending = false,
-        string? Filter = null
+        string? Filter = null,
+        string? Search = null
     ) : IPagedRequest, ISortRequest;
+
+    private sealed record UserTags(
+        int Id,
+        string ShortName,
+        string Color
+    );
     
     private sealed record Response(
         int Id,
@@ -37,7 +44,9 @@ public class GetUsersEndpoint : IEndpoint
         string LastName,
         string? Patronymic,
         string Email,
-        string IconPath
+        string IconPath,
+        string Role,
+        List<UserTags> UserTags
     );
 
     private static async Task<Ok<Result<PagedList<Response>>>> Handle(
@@ -47,11 +56,14 @@ public class GetUsersEndpoint : IEndpoint
         CancellationToken ct
     )
     {
+        // var requestJson = System.Text.Json.JsonSerializer.Serialize(request);
+        // Console.WriteLine("Request object: " + requestJson);
+        
         var spaceId = spaceProvider.GetSpace();
         
         var filters = FilterParser.Parse(request.Filter);
 
-        var query = ApplyFilters(spaceId, filters, database);
+        var query = ApplyFilters(spaceId, filters, request.Search, database);
         
         //TODO: Apply sorting
         
@@ -63,7 +75,20 @@ public class GetUsersEndpoint : IEndpoint
                 user.LastName,
                 user.Patronymic,
                 user.Email,
-                user.IconPath
+                user.IconPath,
+                user.SpaceUsers
+                    .Where(su => su.SpaceId == spaceId)
+                    .Select(su => su.Role.Name)
+                    .First(),
+                user.SpaceUsers
+                    .Where(su => su.SpaceId == spaceId)
+                    .SelectMany(su => su.TagToSpaceUsers)
+                    .Select(tsu => new UserTags(
+                        tsu.Tag.Id,
+                        tsu.Tag.ShortName,
+                        tsu.Tag.Color
+                    ))
+                    .ToList()
             ))
             .ToPagedListAsync(request, ct);
         
@@ -75,12 +100,31 @@ public class GetUsersEndpoint : IEndpoint
     private static IQueryable<User> ApplyFilters(
         int spaceId,
         ParsedFilter filters,
+        string? search,
         SoschedBackDbContext dbContext
     )
     {
         var baseQuery = dbContext.Users
             .AsNoTracking()
             .Where(u => u.SpaceUsers.Any(su => su.SpaceId == spaceId));
+        
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+            var searchLower = $"%{search.ToLower()}%";
+
+            baseQuery = baseQuery.Where(u =>
+                EF.Functions.ILike(u.FirstName + " " + u.LastName + " " + (u.Patronymic ?? ""), searchLower) ||
+                EF.Functions.ILike(u.FirstName + " " + (u.Patronymic ?? "") + " " + u.LastName, searchLower) ||
+                EF.Functions.ILike(u.LastName + " " + u.FirstName + " " + (u.Patronymic ?? ""), searchLower) ||
+                EF.Functions.ILike(u.LastName + " " + (u.Patronymic ?? "") + " " + u.FirstName, searchLower) ||
+                EF.Functions.ILike((u.Patronymic ?? "") + " " + u.FirstName + " " + u.LastName, searchLower) ||
+                EF.Functions.ILike((u.Patronymic ?? "") + " " + u.LastName + " " + u.FirstName, searchLower) ||
+                EF.Functions.ILike(u.FirstName, searchLower) ||
+                EF.Functions.ILike(u.LastName, searchLower) ||
+                EF.Functions.ILike(u.Patronymic ?? "", searchLower) ||
+                EF.Functions.ILike(u.Email, searchLower)
+            );
+        }
         
         if (filters.Has(FilterConstants.RoleKey))
         {

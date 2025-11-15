@@ -18,6 +18,7 @@ using SoschedBack.Spaces.Endpoints.CreateSpaces;
 using SoschedBack.Spaces.Endpoints.GetSpaceById;
 using SoschedBack.Spaces.Endpoints.GetSpaces;
 using SoschedBack.Tags.Endpoints.CreateTags;
+using SoschedBack.Tags.Endpoints.DeleteTag;
 using SoschedBack.Tags.Endpoints.GetTagById;
 using SoschedBack.Tags.Endpoints.GetTags;
 using SoschedBack.TagTypes.Endpoints.CreateTagTypes;
@@ -112,6 +113,7 @@ public static class Endpoints
         endpoints.MapEndpoint<GetTagsEndpoint>();
         endpoints.MapEndpoint<GetTagByIdEndpoint>();
         endpoints.MapEndpoint<CreateTagsEndpoint>();
+        endpoints.MapEndpoint<DeleteTagByIdEndpoint>();
     }
 
     private static void MapUserEndpoints(this IEndpointRouteBuilder app)
