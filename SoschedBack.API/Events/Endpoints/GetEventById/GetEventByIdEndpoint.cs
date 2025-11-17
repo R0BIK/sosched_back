@@ -27,7 +27,6 @@ public class GetEventByIdEndpoint : IEndpoint
         string Color,
         DateTimeOffset DateStart,
         DateTimeOffset DateEnd,
-        int EventTypeId,
         int? CoordinatorId
     );
 
@@ -50,7 +49,6 @@ public class GetEventByIdEndpoint : IEndpoint
             myEvent.Color,
             myEvent.DateStart,
             myEvent.DateEnd,
-            myEvent.EventTypeId,
             myEvent.CoordinatorId
         );
         

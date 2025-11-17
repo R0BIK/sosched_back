@@ -56,7 +56,6 @@ public static class DataSeeder
             // Группа 1: Сущности без внешних ключей
             if (seedData.Spaces != null) await context.Spaces.AddRangeAsync(seedData.Spaces);
             if (seedData.Permissions != null) await context.Permissions.AddRangeAsync(seedData.Permissions);
-            if (seedData.EventTypes != null) await context.EventTypes.AddRangeAsync(seedData.EventTypes);
             await context.SaveChangesAsync();
 
             // Группа 2: Зависят от Группы 1
@@ -114,7 +113,7 @@ public static class DataSeeder
         // Имена должны ТОЧНО соответствовать вашей БД (включая кавычки, т.к. у вас camelCase)
         var tables = new[]
         {
-            "Permissions", "EventTypes", "Spaces", "Roles", "PermissionToRoles",
+            "Permissions", "Spaces", "Roles", "PermissionToRoles",
             "Users", "Events", 
             "EventToSpaceUsers", // <<< ИСПРАВЛЕНО: Было "EventToUsers"
             "TagTypes", "Tags", "TagToSpaceUsers", "SpaceUsers"

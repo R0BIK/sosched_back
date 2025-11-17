@@ -42,6 +42,10 @@ public class RequestValidator : AbstractValidator<GetUsersEndpoint.Request>
                             {
                                 await ValidateTagTypeAsync(key, values, spaceId, dbContext, context, ct);
                             }
+                            else if (key.StartsWith(FilterConstants.TagKey, StringComparison.OrdinalIgnoreCase))
+                            {
+                                await ValidateTagsAsync(values, spaceId, dbContext, context, ct);
+                            }
                             else
                             {
                                 context.AddFailure($"Unknown filter key for this entity: '{key}'.");
@@ -66,6 +70,29 @@ public class RequestValidator : AbstractValidator<GetUsersEndpoint.Request>
         var invalidRoles = values.Except(existingRoles, StringComparer.OrdinalIgnoreCase).ToArray();
         if (invalidRoles.Length > 0)
             context.AddFailure($"Invalid roles: {string.Join(", ", invalidRoles)}.");
+    }
+    
+    private static async Task ValidateTagsAsync(
+        IEnumerable<string> values,
+        int spaceId,
+        SoschedBackDbContext dbContext,
+        CustomContext context,
+        CancellationToken ct)
+    {
+        var existingTags = await dbContext.Tags
+            .AsNoTracking()
+            .Where(t => t.SpaceId == spaceId && values.Contains(t.ShortName))
+            .Select(t => t.ShortName)
+            .ToListAsync(ct);
+
+        var invalidTags = values
+            .Except(existingTags, StringComparer.OrdinalIgnoreCase)
+            .ToArray();
+
+        if (invalidTags.Length > 0)
+        {
+            context.AddFailure($"Invalid tags: {string.Join(", ", invalidTags)}.");
+        }
     }
     
     private static async Task ValidateTagTypeAsync(

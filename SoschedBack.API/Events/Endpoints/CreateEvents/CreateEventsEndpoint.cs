@@ -30,7 +30,6 @@ public class CreateEventsEndpoint : IEndpoint
         string Color,
         DateTimeOffset DateStart,
         DateTimeOffset DateEnd,
-        int EventTypeId,
         int? CoordinatorId,
         RepeatInfo? RepeatInfo,
         bool Confirmed = false
@@ -44,7 +43,6 @@ public class CreateEventsEndpoint : IEndpoint
         string Color,
         DateTimeOffset DateStart,
         DateTimeOffset DateEnd,
-        int EventTypeId,
         int? CoordinatorId,
         int? RepeatsCount
     );
@@ -68,7 +66,6 @@ public class CreateEventsEndpoint : IEndpoint
             Color = request.Color,
             DateStart = request.DateStart,
             DateEnd = request.DateEnd,
-            EventTypeId = request.EventTypeId,
             CoordinatorId = request.CoordinatorId,
             CreatorId = user.Id,
             SpaceId = spaceId,
@@ -87,7 +84,6 @@ public class CreateEventsEndpoint : IEndpoint
                 myEvent.Color,
                 myEvent.DateStart,
                 myEvent.DateEnd,
-                myEvent.EventTypeId,
                 myEvent.CoordinatorId,
                 null
             );
@@ -107,7 +103,6 @@ public class CreateEventsEndpoint : IEndpoint
             myEvent.Color,
             myEvent.DateStart,
             myEvent.DateEnd,
-            myEvent.EventTypeId,
             myEvent.CoordinatorId,
             repeats.Count
         );

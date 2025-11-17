@@ -26,8 +26,6 @@ public class Event : AuditableEntity, ISpaceEntity
     
     public int SpaceId { get; set; }
     
-    public virtual EventType EventType { get; set; } = null!;
-    
     public virtual User Creator { get; set; } = null!;
     
     public virtual User? Coordinator { get; set; }

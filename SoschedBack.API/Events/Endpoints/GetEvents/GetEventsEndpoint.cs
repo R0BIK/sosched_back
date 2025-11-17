@@ -42,7 +42,6 @@ public class GetEventsEndpoint : IEndpoint
         string Color,
         DateTimeOffset DateStart,
         DateTimeOffset DateEnd,
-        int EventTypeId,
         int? CoordinatorId,
         int UsersCount
     ) : IUsersCountResponse;
@@ -83,7 +82,6 @@ public class GetEventsEndpoint : IEndpoint
                 myEvent.Color,
                 myEvent.DateStart,
                 myEvent.DateEnd,
-                myEvent.EventTypeId,
                 myEvent.CoordinatorId,
                 0
             ))

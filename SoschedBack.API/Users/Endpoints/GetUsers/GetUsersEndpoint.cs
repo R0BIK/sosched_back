@@ -147,6 +147,13 @@ public class GetUsersEndpoint : IEndpoint
                 )
             );
         }
+        
+        if (filters.Has(FilterConstants.TagKey))
+        {
+            var tags = filters.GetValues(FilterConstants.TagKey);
+            baseQuery = baseQuery
+                .Where(u => u.SpaceUsers.Any(su => (su.TagToSpaceUsers.Any(sut => tags.Contains(sut.Tag.ShortName)))));
+        }
 
         return baseQuery;
     }

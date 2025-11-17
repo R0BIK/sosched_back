@@ -7,13 +7,12 @@ using SoschedBack.Common.Filters;
 using SoschedBack.Events.Endpoints.CreateEvents;
 using SoschedBack.Events.Endpoints.GetEventById;
 using SoschedBack.Events.Endpoints.GetEvents;
-using SoschedBack.EventTypes.Endpoints.GetEventTypeById;
-using SoschedBack.EventTypes.Endpoints.GetEventTypes;
 using SoschedBack.Permissions.Endpoints.GetPermissionById;
-using SoschedBack.Permissions.Endpoints.GetPermissionsTypes;
+using SoschedBack.Permissions.Endpoints.GetPermissions;
 using SoschedBack.Roles.Endpoints.CreateRoles;
 using SoschedBack.Roles.Endpoints.GetRoleById;
 using SoschedBack.Roles.Endpoints.GetRoles;
+using SoschedBack.Search.SearchUsersAndTags;
 using SoschedBack.Spaces.Endpoints.CreateSpaces;
 using SoschedBack.Spaces.Endpoints.GetSpaceById;
 using SoschedBack.Spaces.Endpoints.GetSpaces;
@@ -21,6 +20,7 @@ using SoschedBack.Tags.Endpoints.CreateTags;
 using SoschedBack.Tags.Endpoints.DeleteTag;
 using SoschedBack.Tags.Endpoints.GetTagById;
 using SoschedBack.Tags.Endpoints.GetTags;
+using SoschedBack.Tags.Endpoints.UpdateTagUsers;
 using SoschedBack.TagTypes.Endpoints.CreateTagTypes;
 using SoschedBack.TagTypes.Endpoints.DeleteTagType;
 using SoschedBack.TagTypes.Endpoints.GetTagTypeById;
@@ -40,9 +40,9 @@ public static class Endpoints
         app.MapAuthenticationEndpoints();
         app.MapSpaceEndpoints();
         app.MapUserEndpoints();
-        app.MapEventTypesEndpoints();
         app.MapPermissionsEndpoints();
         app.MapEventsEndpoints();
+        app.MapSearchEndpoints();
     }
     
     private static void MapEventsEndpoints(this IEndpointRouteBuilder app)
@@ -55,22 +55,21 @@ public static class Endpoints
         endpoints.MapEndpoint<GetEventByIdEndpoint>();
     }
     
+    private static void MapSearchEndpoints(this IEndpointRouteBuilder app)
+    {
+        var endpoints = app.MapSpaceDomainGroup("/search")
+            .WithTags("Search");
+
+        endpoints.MapEndpoint<SearchUsersAndTagsEndpoint>();
+    }
+    
     private static void MapPermissionsEndpoints(this IEndpointRouteBuilder app)
     {
         var endpoints = app.MapGroup("/permissions")
             .WithTags("Permissions");
 
-        endpoints.MapEndpoint<GetPermissionsTypesEndpoint>();
+        endpoints.MapEndpoint<GetPermissionsEndpoint>();
         endpoints.MapEndpoint<GetPermissionByIdEndpoint>();
-    }
-    
-    private static void MapEventTypesEndpoints(this IEndpointRouteBuilder app)
-    {
-        var endpoints = app.MapGroup("/eventTypes")
-            .WithTags("EventTypes");
-
-        endpoints.MapEndpoint<GetEventTypesEndpoint>();
-        endpoints.MapEndpoint<GetEventTypeByIdEndpoint>();
     }
     
     private static void MapAuthenticationEndpoints(this IEndpointRouteBuilder app)
@@ -114,6 +113,7 @@ public static class Endpoints
         endpoints.MapEndpoint<GetTagByIdEndpoint>();
         endpoints.MapEndpoint<CreateTagsEndpoint>();
         endpoints.MapEndpoint<DeleteTagByIdEndpoint>();
+        endpoints.MapEndpoint<UpdateTagUsersEndpoint>();
     }
 
     private static void MapUserEndpoints(this IEndpointRouteBuilder app)

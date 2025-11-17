@@ -8,9 +8,9 @@ using SoschedBack.Common.Pagination.PagedRequest;
 using SoschedBack.Core.Common.UnifiedResponse;
 using SoschedBack.Storage;
 
-namespace SoschedBack.Permissions.Endpoints.GetPermissionsTypes;
+namespace SoschedBack.Permissions.Endpoints.GetPermissions;
 
-public class GetPermissionsTypesEndpoint : IEndpoint
+public class GetPermissionsEndpoint : IEndpoint
 {
     public static IEndpointConventionBuilder Map(IEndpointRouteBuilder app) => app
         .MapGet("/", Handle)

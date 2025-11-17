@@ -26,14 +26,6 @@ public class RequestValidator : AbstractValidator<CreateEventsEndpoint.Request>
         RuleFor(x => x.Color)
             .MustBeValidString();
         
-        RuleFor(x => x.EventTypeId)
-            .MustBeValidId()
-            .DependentRules(() =>
-            {
-                RuleFor(x => x.EventTypeId)
-                    .MustBeValidEntityId<CreateEventsEndpoint.Request, EventType>(database);
-            });
-        
         RuleFor(x => x.CoordinatorId)
             .MustBeValidOptionalId()
             .DependentRules(() =>
@@ -84,7 +76,6 @@ public class RequestValidator : AbstractValidator<CreateEventsEndpoint.Request>
                 
                 var name = request.Name.Trim();
                 var location = request.Location?.Trim();
-                var eventTypeId = request.EventTypeId;
                 var coordinatorId = request.CoordinatorId;
                 var dateStart = request.DateStart;
                 var dateEnd = request.DateEnd;
@@ -97,7 +88,6 @@ public class RequestValidator : AbstractValidator<CreateEventsEndpoint.Request>
                             e.Location == location &&
                             e.DateStart == dateStart &&
                             e.DateEnd == dateEnd &&
-                            e.EventTypeId == eventTypeId &&
                             e.CoordinatorId == coordinatorId,
                         cancellationToken);
 
@@ -114,7 +104,6 @@ public class RequestValidator : AbstractValidator<CreateEventsEndpoint.Request>
 
         validator.RuleFor(x => x.Name).MustBeValidTitle();
         validator.RuleFor(x => x.Color).MustBeValidString();
-        validator.RuleFor(x => x.EventTypeId).MustBeValidId();
 
         validator.RuleFor(x => x.DateStart)
             .MustBeValidDate()

@@ -87,8 +87,6 @@ namespace SoschedBack.Storage.Migrations
 
                     b.HasIndex("CreatorId");
 
-                    b.HasIndex("EventTypeId");
-
                     b.HasIndex("SpaceId");
 
                     b.ToTable("Events");
@@ -115,39 +113,6 @@ namespace SoschedBack.Storage.Migrations
                     b.HasIndex("SpaceUserId");
 
                     b.ToTable("EventToSpaceUsers");
-                });
-
-            modelBuilder.Entity("SoschedBack.Core.Models.EventType", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTimeOffset>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
-
-                    b.Property<DateTimeOffset?>("DeletedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("deleted_at");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<DateTimeOffset>("UpdatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("updated_at")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("EventTypes");
                 });
 
             modelBuilder.Entity("SoschedBack.Core.Models.Permission", b =>
@@ -492,12 +457,6 @@ namespace SoschedBack.Storage.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("SoschedBack.Core.Models.EventType", "EventType")
-                        .WithMany("Events")
-                        .HasForeignKey("EventTypeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("SoschedBack.Core.Models.Space", "Space")
                         .WithMany("Events")
                         .HasForeignKey("SpaceId")
@@ -507,8 +466,6 @@ namespace SoschedBack.Storage.Migrations
                     b.Navigation("Coordinator");
 
                     b.Navigation("Creator");
-
-                    b.Navigation("EventType");
 
                     b.Navigation("Space");
                 });
@@ -641,11 +598,6 @@ namespace SoschedBack.Storage.Migrations
             modelBuilder.Entity("SoschedBack.Core.Models.Event", b =>
                 {
                     b.Navigation("EventToSpaceUsers");
-                });
-
-            modelBuilder.Entity("SoschedBack.Core.Models.EventType", b =>
-                {
-                    b.Navigation("Events");
                 });
 
             modelBuilder.Entity("SoschedBack.Core.Models.Permission", b =>

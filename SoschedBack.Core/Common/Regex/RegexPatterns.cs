@@ -7,8 +7,8 @@ public class RegexPatterns
     public static readonly Dictionary<Pattern, (System.Text.RegularExpressions.Regex Pattern, System.Text.RegularExpressions.Regex PostgresPattern, short MaxLength, string Description)> Patterns = new()
     {
         [Pattern.Title] = 
-            (new System.Text.RegularExpressions.Regex(@"^[A-Za-z0-9\s\-.,_&()]+$", RegexOptions.Compiled),
-            new System.Text.RegularExpressions.Regex(@"^[A-Za-z0-9\s\-.,_&()]+$", RegexOptions.Compiled),
+            (new System.Text.RegularExpressions.Regex(@"^[\p{L}\p{N}\s\-.,_&()]+$", RegexOptions.Compiled),
+            new System.Text.RegularExpressions.Regex(@"^[[:alnum:]\s\-.,_&()]+$", RegexOptions.Compiled),
             100, 
             "Titles must contain letters, numbers, spaces, and punctuation like -.,_&()."),
 
@@ -19,8 +19,8 @@ public class RegexPatterns
             "Full names may include letters, apostrophes, hyphens, and spaces."),
 
         [Pattern.Address] = 
-            (new System.Text.RegularExpressions.Regex(@"^[\p{L}\d\s'.,#/()-]+$", RegexOptions.Compiled), //TODO: '#' doesn't work
-            new System.Text.RegularExpressions.Regex(@"^[[:alpha:]\d\s'.,#/()-]+$", RegexOptions.Compiled), 
+            (new System.Text.RegularExpressions.Regex(@"^[\p{L}\p{N}\s'.,#/()\-]+$", RegexOptions.Compiled), //TODO: '#' doesn't work
+            new System.Text.RegularExpressions.Regex(@"^[[:alnum:]\s'.,#/()\-]+$", RegexOptions.Compiled), 
             200, 
             "Addresses may contain letters, numbers, spaces, and punctuation like '.,#/-()."),
 
@@ -50,8 +50,8 @@ public class RegexPatterns
             "Domain must be valid and support international formats like sub.domain.com."),
 
         [Pattern.Description] = 
-            (new System.Text.RegularExpressions.Regex(@"^[\p{L}\d\s.,!?]*$", RegexOptions.Compiled),
-            new System.Text.RegularExpressions.Regex(@"^[[:alpha:]\d\s.,!?]*$", RegexOptions.Compiled), 
+            (new System.Text.RegularExpressions.Regex(@"^[\p{L}\p{N}\s.,!?'-]*$", RegexOptions.Compiled),
+            new System.Text.RegularExpressions.Regex(@"^[[:alnum:]\s.,!?'-]*$", RegexOptions.Compiled), 
             250, 
             "Descriptions may include letters, numbers, spaces, and punctuation like .,!?"),
     };

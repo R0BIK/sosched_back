@@ -13,13 +13,6 @@
     { "Id": 5, "Name": "manage_tags", "Description": "Право управлять тегами." },
     { "Id": 6, "Name": "approve_vacations", "Description": "Право одобрять отпуски." }
   ],
-  "EventTypes": [
-    { "Id": 1, "Name": "Встреча" },
-    { "Id": 2, "Name": "Дедлайн" },
-    { "Id": 3, "Name": "Отпуск" },
-    { "Id": 4, "Name": "1-on-1" },
-    { "Id": 5, "Name": "Общее (All-hands)" }
-  ],
   "Roles": [
     { "Id": 1, "Name": "Администратор", "SpaceId": 1 },
     { "Id": 2, "Name": "Пользователь", "SpaceId": 1 },
@@ -151,18 +144,18 @@
     { "UserId": 7, "TagId": 5 }
   ],
   "Events": [
-    { "Id": 1, "Name": "Еженедельное планирование", "Location": "Переговорная 1", "Description": "Обсуждение задач на неделю", "CreatorId": 1, "EventDateId": 1, "Color": "#3A87AD", "DateStart": "2025-11-10T09:00:00Z", "DateEnd": "2025-11-10T10:00:00Z", "EventTypeId": 1, "CoordinatorId": 1, "SpaceId": 1 },
-    { "Id": 2, "Name": "Запуск рекламной кампании Q4", "Location": "Онлайн", "Description": "Финальный запуск кампании Q4", "CreatorId": 3, "EventDateId": 2, "Color": "#FF0000", "DateStart": "2025-11-15T12:00:00Z", "DateEnd": "2025-11-15T12:00:00Z", "EventTypeId": 2, "CoordinatorId": 3, "SpaceId": 2 },
-    { "Id": 3, "Name": "Демо Спринта 23.4", "Location": "R&D Area", "Description": "Показ результатов спринта", "CreatorId": 5, "EventDateId": 3, "Color": "#512BD4", "DateStart": "2025-11-14T15:00:00Z", "DateEnd": "2025-11-14T16:00:00Z", "EventTypeId": 1, "CoordinatorId": 5, "SpaceId": 3 },
-    { "Id": 4, "Name": "Еженедельная встреча поддержки", "Location": "Zoom", "Description": "Обсуждение сложных тикетов", "CreatorId": 8, "EventDateId": 4, "Color": "#008DD0", "DateStart": "2025-11-10T11:00:00Z", "DateEnd": "2025-11-10T11:30:00Z", "EventTypeId": 1, "CoordinatorId": 8, "SpaceId": 4 },
-    { "Id": 5, "Name": "1-on-1: Иванов и Петров", "Location": "Кабинет 101", "Description": "Обсуждение квартальных целей", "CreatorId": 1, "EventDateId": 5, "Color": "#FFA500", "DateStart": "2025-11-12T14:00:00Z", "DateEnd": "2025-11-12T14:30:00Z", "EventTypeId": 4, "CoordinatorId": 1, "SpaceId": 1 },
-    { "Id": 6, "Name": "Отпуск: Лебедев Д.О.", "Location": "N/A", "Description": "Ежегодный отпуск", "CreatorId": 7, "EventDateId": 6, "Color": "#00FF00", "DateStart": "2025-11-17T00:00:00Z", "DateEnd": "2025-11-21T23:59:59Z", "EventTypeId": 3, "CoordinatorId": 7, "SpaceId": 3 },
-    { "Id": 7, "Name": "Общее собрание (All-hands)", "Location": "Главный холл", "Description": "Итоги Q3, планы на Q4", "CreatorId": 1, "EventDateId": 7, "Color": "#8E33FF", "DateStart": "2025-11-20T10:00:00Z", "DateEnd": "2025-11-20T11:00:00Z", "EventTypeId": 5, "CoordinatorId": 1, "SpaceId": 1 },
-    { "Id": 8, "Name": "Дедлайн: Проект 'Вега'", "Location": "N/A", "Description": "Сдача проекта 'Вега'", "CreatorId": 1, "EventDateId": 8, "Color": "#FF0000", "DateStart": "2025-11-25T18:00:00Z", "DateEnd": "2025-11-25T18:00:00Z", "EventTypeId": 2, "CoordinatorId": 2, "SpaceId": 1 },
-    { "Id": 9, "Name": "Встреча по SEO", "Location": "Онлайн", "Description": "Обсуждение стратегии", "CreatorId": 4, "EventDateId": 9, "Color": "#8E33FF", "DateStart": "2025-11-13T10:00:00Z", "DateEnd": "2025-11-13T11:00:00Z", "EventTypeId": 1, "CoordinatorId": 4, "SpaceId": 2 },
-    { "Id": 10, "Name": "Отпуск: Ковалева Ю.О.", "Location": "N/A", "Description": "Ежегодный отпуск", "CreatorId": 17, "EventDateId": 10, "Color": "#00FF00", "DateStart": "2025-12-01T00:00:00Z", "DateEnd": "2025-12-05T23:59:59Z", "EventTypeId": 3, "CoordinatorId": 3, "SpaceId": 2 },
-    { "Id": 11, "Name": "1-on-1: Смирнов и Соколов", "Location": "Кабинет 302", "Description": "Менторинг", "CreatorId": 5, "EventDateId": 11, "Color": "#FFA500", "DateStart": "2025-11-18T16:00:00Z", "DateEnd": "2025-11-18T16:30:00Z", "EventTypeId": 4, "CoordinatorId": 5, "SpaceId": 3 },
-    { "Id": 12, "Name": "Дедлайн: Исправление критического бага", "Location": "N/A", "Description": "Баг в модуле авторизации", "CreatorId": 13, "EventDateId": 12, "Color": "#FF0000", "DateStart": "2025-11-16T10:00:00Z", "DateEnd": "2025-11-16T10:00:00Z", "EventTypeId": 2, "CoordinatorId": 5, "SpaceId": 3 }
+    { "Id": 1, "Name": "Еженедельное планирование", "Location": "Переговорная 1", "Description": "Обсуждение задач на неделю", "CreatorId": 1, "EventDateId": 1, "Color": "#3A87AD", "DateStart": "2025-11-10T09:00:00Z", "DateEnd": "2025-11-10T10:00:00Z", "CoordinatorId": 1, "SpaceId": 1 },
+    { "Id": 2, "Name": "Запуск рекламной кампании Q4", "Location": "Онлайн", "Description": "Финальный запуск кампании Q4", "CreatorId": 3, "EventDateId": 2, "Color": "#FF0000", "DateStart": "2025-11-15T12:00:00Z", "DateEnd": "2025-11-15T12:00:00Z", "CoordinatorId": 3, "SpaceId": 2 },
+    { "Id": 3, "Name": "Демо Спринта 23.4", "Location": "R&D Area", "Description": "Показ результатов спринта", "CreatorId": 5, "EventDateId": 3, "Color": "#512BD4", "DateStart": "2025-11-14T15:00:00Z", "DateEnd": "2025-11-14T16:00:00Z", "CoordinatorId": 5, "SpaceId": 3 },
+    { "Id": 4, "Name": "Еженедельная встреча поддержки", "Location": "Zoom", "Description": "Обсуждение сложных тикетов", "CreatorId": 8, "EventDateId": 4, "Color": "#008DD0", "DateStart": "2025-11-10T11:00:00Z", "DateEnd": "2025-11-10T11:30:00Z", "CoordinatorId": 8, "SpaceId": 4 },
+    { "Id": 5, "Name": "1-on-1: Иванов и Петров", "Location": "Кабинет 101", "Description": "Обсуждение квартальных целей", "CreatorId": 1, "EventDateId": 5, "Color": "#FFA500", "DateStart": "2025-11-12T14:00:00Z", "DateEnd": "2025-11-12T14:30:00Z", "CoordinatorId": 1, "SpaceId": 1 },
+    { "Id": 6, "Name": "Отпуск: Лебедев Д.О.", "Location": "N/A", "Description": "Ежегодный отпуск", "CreatorId": 7, "EventDateId": 6, "Color": "#00FF00", "DateStart": "2025-11-17T00:00:00Z", "DateEnd": "2025-11-21T23:59:59Z", "CoordinatorId": 7, "SpaceId": 3 },
+    { "Id": 7, "Name": "Общее собрание (All-hands)", "Location": "Главный холл", "Description": "Итоги Q3, планы на Q4", "CreatorId": 1, "EventDateId": 7, "Color": "#8E33FF", "DateStart": "2025-11-20T10:00:00Z", "DateEnd": "2025-11-20T11:00:00Z", "CoordinatorId": 1, "SpaceId": 1 },
+    { "Id": 8, "Name": "Дедлайн: Проект 'Вега'", "Location": "N/A", "Description": "Сдача проекта 'Вега'", "CreatorId": 1, "EventDateId": 8, "Color": "#FF0000", "DateStart": "2025-11-25T18:00:00Z", "DateEnd": "2025-11-25T18:00:00Z", "CoordinatorId": 2, "SpaceId": 1 },
+    { "Id": 9, "Name": "Встреча по SEO", "Location": "Онлайн", "Description": "Обсуждение стратегии", "CreatorId": 4, "EventDateId": 9, "Color": "#8E33FF", "DateStart": "2025-11-13T10:00:00Z", "DateEnd": "2025-11-13T11:00:00Z", "CoordinatorId": 4, "SpaceId": 2 },
+    { "Id": 10, "Name": "Отпуск: Ковалева Ю.О.", "Location": "N/A", "Description": "Ежегодный отпуск", "CreatorId": 17, "EventDateId": 10, "Color": "#00FF00", "DateStart": "2025-12-01T00:00:00Z", "DateEnd": "2025-12-05T23:59:59Z", "CoordinatorId": 3, "SpaceId": 2 },
+    { "Id": 11, "Name": "1-on-1: Смирнов и Соколов", "Location": "Кабинет 302", "Description": "Менторинг", "CreatorId": 5, "EventDateId": 11, "Color": "#FFA500", "DateStart": "2025-11-18T16:00:00Z", "DateEnd": "2025-11-18T16:30:00Z", "CoordinatorId": 5, "SpaceId": 3 },
+    { "Id": 12, "Name": "Дедлайн: Исправление критического бага", "Location": "N/A", "Description": "Баг в модуле авторизации", "CreatorId": 13, "EventDateId": 12, "Color": "#FF0000", "DateStart": "2025-11-16T10:00:00Z", "DateEnd": "2025-11-16T10:00:00Z", "CoordinatorId": 5, "SpaceId": 3 }
   ],
   "EventToSpaceUsers": [
     { "EventId": 1, "SpaceUserId": 1 },

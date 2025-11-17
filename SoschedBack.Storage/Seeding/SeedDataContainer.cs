@@ -6,7 +6,6 @@ public class SeedDataContainer
 {
     public List<Space> Spaces { get; set; }
     public List<Permission> Permissions { get; set; }
-    public List<EventType> EventTypes { get; set; }
     public List<Role> Roles { get; set; }
     public List<TagType> TagTypes { get; set; }
     public List<User> Users { get; set; }
