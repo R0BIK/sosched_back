@@ -20,6 +20,7 @@ using SoschedBack.Tags.Endpoints.CreateTags;
 using SoschedBack.Tags.Endpoints.DeleteTag;
 using SoschedBack.Tags.Endpoints.GetTagById;
 using SoschedBack.Tags.Endpoints.GetTags;
+using SoschedBack.Tags.Endpoints.UpdateTag;
 using SoschedBack.Tags.Endpoints.UpdateTagUsers;
 using SoschedBack.TagTypes.Endpoints.CreateTagTypes;
 using SoschedBack.TagTypes.Endpoints.DeleteTagType;
@@ -114,6 +115,7 @@ public static class Endpoints
         endpoints.MapEndpoint<CreateTagsEndpoint>();
         endpoints.MapEndpoint<DeleteTagByIdEndpoint>();
         endpoints.MapEndpoint<UpdateTagUsersEndpoint>();
+        endpoints.MapEndpoint<UpdateTagEndpoint>();
     }
 
     private static void MapUserEndpoints(this IEndpointRouteBuilder app)

@@ -31,16 +31,8 @@ public class UpdateTagUsersEndpoint : IEndpoint
     {
         var spaceId = spaceProvider.GetSpace();
         var tagId = parameters.TagId;
-
-        if (body.UsersToAdd is { Count: > 0 })
-        {
-            await AddUsers(spaceId, tagId, body.UsersToAdd, db, ct);
-        }
-
-        if (body.TagsToAddUsersFrom is { Count: > 0 })
-        {
-            await AddUsersFromOtherTags(spaceId, tagId, body.TagsToAddUsersFrom, db, ct);
-        }
+        
+        await AddUsersHandler(spaceId, tagId, body.UsersToAdd, body.TagsToAddUsersFrom, db, ct);
 
         if (body.UsersToRemove is { Count: > 0 })
         {
@@ -52,64 +44,52 @@ public class UpdateTagUsersEndpoint : IEndpoint
         return TypedResults.Ok(Result.Success("Tag users updated successfully"));
     }
 
-    private static async Task AddUsers(
-        int spaceId,
-        int tagId,
-        List<int> userIds,
-        SoschedBackDbContext db,
-        CancellationToken ct)
-    {
-        var spaceUserIds = await db.SpaceUsers
-            .Where(su => su.SpaceId == spaceId && userIds.Contains(su.UserId))
-            .Select(su => su.Id)
-            .ToListAsync(ct);
-
-        if (spaceUserIds.Count == 0)
-            return;
-
-        var existing = await db.TagToSpaceUsers
-            .Where(tsu => tsu.TagId == tagId && spaceUserIds.Contains(tsu.SpaceUserId))
-            .Select(tsu => tsu.SpaceUserId)
-            .ToListAsync(ct);
-
-        var newRelations = spaceUserIds
-            .Where(id => !existing.Contains(id))
-            .Select(id => new TagToSpaceUser
-            {
-                TagId = tagId,
-                SpaceUserId = id
-            })
-            .ToList();
-
-        if (newRelations.Count > 0)
-        {
-            await db.TagToSpaceUsers.AddRangeAsync(newRelations, ct);
-        }
-    }
-
-    private static async Task AddUsersFromOtherTags(
+    private static async Task AddUsersHandler(
         int spaceId,
         int targetTagId,
-        List<int> sourceTagIds,
+        List<int>? usersToAdd,
+        List<int>? tagsToAddUsersFrom,
         SoschedBackDbContext db,
         CancellationToken ct)
     {
-        var spaceUserIds = await db.TagToSpaceUsers
-            .Where(tsu => sourceTagIds.Contains(tsu.TagId))
-            .Select(tsu => tsu.SpaceUserId)
-            .Distinct()
-            .ToListAsync(ct);
 
-        if (spaceUserIds.Count == 0)
+        var spaceUserIdsFromList = new List<int>();
+        if (usersToAdd is { Count: > 0 })
+        {
+            spaceUserIdsFromList = await db.SpaceUsers
+                .Where(su => su.SpaceId == spaceId && usersToAdd.Contains(su.UserId))
+                .Select(su => su.Id)
+                .ToListAsync(ct);
+        }
+
+        var spaceUserIdsFromTags = new List<int>();
+        if (tagsToAddUsersFrom is { Count: > 0 })
+        {
+            spaceUserIdsFromTags = await db.TagToSpaceUsers
+                .Where(tsu => tagsToAddUsersFrom.Contains(tsu.TagId))
+                .Select(tsu => tsu.SpaceUserId)
+                .Distinct()
+                .ToListAsync(ct);
+        }
+        
+        var allSpaceUserIdsToAdd = new HashSet<int>(spaceUserIdsFromList);
+        allSpaceUserIdsToAdd.UnionWith(spaceUserIdsFromTags);
+
+        if (allSpaceUserIdsToAdd.Count == 0)
+        {
             return;
+        }
 
-        var existing = await db.TagToSpaceUsers
-            .Where(tsu => tsu.TagId == targetTagId && spaceUserIds.Contains(tsu.SpaceUserId))
+        
+        var existingSpaceUserIds = await db.TagToSpaceUsers
+            .Where(tsu => tsu.TagId == targetTagId && allSpaceUserIdsToAdd.Contains(tsu.SpaceUserId))
             .Select(tsu => tsu.SpaceUserId)
             .ToListAsync(ct);
+        
+        var existingSet = new HashSet<int>(existingSpaceUserIds);
 
-        var newRelations = spaceUserIds
-            .Where(id => !existing.Contains(id))
+        var newRelations = allSpaceUserIdsToAdd
+            .Where(id => !existingSet.Contains(id))
             .Select(id => new TagToSpaceUser
             {
                 TagId = targetTagId,
