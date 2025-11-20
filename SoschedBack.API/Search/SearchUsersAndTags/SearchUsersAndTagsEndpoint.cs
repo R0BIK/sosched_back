@@ -58,6 +58,7 @@ public class SearchUsersAndTagsEndpoint : IEndpoint
         var limit = request.Limit ?? 10;
 
         var users = await db.Users
+            .AsNoTracking()
             .Where(u => u.SpaceUsers.Any(su => su.SpaceId == spaceId)
                         && (
                             EF.Functions.ILike(u.FirstName, pattern) ||
@@ -84,6 +85,7 @@ public class SearchUsersAndTagsEndpoint : IEndpoint
             .ToListAsync(ct);
 
         var tags = await db.Tags
+            .AsNoTracking()
             .Where(t => t.SpaceId == spaceId
                         && (
                             EF.Functions.ILike(t.Name, pattern) ||

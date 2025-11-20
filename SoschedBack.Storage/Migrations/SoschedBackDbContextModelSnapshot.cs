@@ -62,9 +62,6 @@ namespace SoschedBack.Storage.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("text");
 
-                    b.Property<int>("EventTypeId")
-                        .HasColumnType("integer");
-
                     b.Property<string>("Location")
                         .HasColumnType("text");
 
@@ -447,11 +444,11 @@ namespace SoschedBack.Storage.Migrations
 
             modelBuilder.Entity("SoschedBack.Core.Models.Event", b =>
                 {
-                    b.HasOne("SoschedBack.Core.Models.User", "Coordinator")
+                    b.HasOne("SoschedBack.Core.Models.SpaceUser", "Coordinator")
                         .WithMany()
                         .HasForeignKey("CoordinatorId");
 
-                    b.HasOne("SoschedBack.Core.Models.User", "Creator")
+                    b.HasOne("SoschedBack.Core.Models.SpaceUser", "Creator")
                         .WithMany()
                         .HasForeignKey("CreatorId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -479,7 +476,7 @@ namespace SoschedBack.Storage.Migrations
                         .IsRequired();
 
                     b.HasOne("SoschedBack.Core.Models.SpaceUser", "SpaceUser")
-                        .WithMany("EventToUsers")
+                        .WithMany("EventToSpaceUsers")
                         .HasForeignKey("SpaceUserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -627,7 +624,7 @@ namespace SoschedBack.Storage.Migrations
 
             modelBuilder.Entity("SoschedBack.Core.Models.SpaceUser", b =>
                 {
-                    b.Navigation("EventToUsers");
+                    b.Navigation("EventToSpaceUsers");
 
                     b.Navigation("TagToSpaceUsers");
                 });

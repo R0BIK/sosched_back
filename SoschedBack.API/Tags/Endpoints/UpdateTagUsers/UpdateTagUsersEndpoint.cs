@@ -57,6 +57,7 @@ public class UpdateTagUsersEndpoint : IEndpoint
         if (usersToAdd is { Count: > 0 })
         {
             spaceUserIdsFromList = await db.SpaceUsers
+                .AsNoTracking()
                 .Where(su => su.SpaceId == spaceId && usersToAdd.Contains(su.UserId))
                 .Select(su => su.Id)
                 .ToListAsync(ct);
@@ -66,6 +67,7 @@ public class UpdateTagUsersEndpoint : IEndpoint
         if (tagsToAddUsersFrom is { Count: > 0 })
         {
             spaceUserIdsFromTags = await db.TagToSpaceUsers
+                .AsNoTracking()
                 .Where(tsu => tagsToAddUsersFrom.Contains(tsu.TagId))
                 .Select(tsu => tsu.SpaceUserId)
                 .Distinct()
@@ -82,6 +84,7 @@ public class UpdateTagUsersEndpoint : IEndpoint
 
         
         var existingSpaceUserIds = await db.TagToSpaceUsers
+            .AsNoTracking()
             .Where(tsu => tsu.TagId == targetTagId && allSpaceUserIdsToAdd.Contains(tsu.SpaceUserId))
             .Select(tsu => tsu.SpaceUserId)
             .ToListAsync(ct);
@@ -111,6 +114,7 @@ public class UpdateTagUsersEndpoint : IEndpoint
         CancellationToken ct)
     {
         var spaceUserIds = await db.SpaceUsers
+            .AsNoTracking()
             .Where(su => su.SpaceId == spaceId && userIds.Contains(su.UserId))
             .Select(su => su.Id)
             .ToListAsync(ct);
@@ -119,6 +123,7 @@ public class UpdateTagUsersEndpoint : IEndpoint
             return;
 
         var relationsToRemove = await db.TagToSpaceUsers
+            .AsNoTracking()
             .Where(tsu => tsu.TagId == tagId && spaceUserIds.Contains(tsu.SpaceUserId))
             .ToListAsync(ct);
 

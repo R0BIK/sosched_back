@@ -47,7 +47,9 @@ public class UpdateTagEndpoint : IEndpoint
     {
         var spaceId = spaceProvider.GetSpace();
         
-        var tag = await database.Tags.FirstOrDefaultAsync(
+        var tag = await database.Tags
+            .AsNoTracking()
+            .FirstAsync(
             t => t.Id == parameters.TagId && t.SpaceId == spaceId, 
             cancellationToken
         );

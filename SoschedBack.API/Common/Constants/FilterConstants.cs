@@ -11,7 +11,7 @@ public static class FilterConstants
     
     public const string TagKey = "tag";
     
-    public const string EventTypeKey = "eventType";
+    public const string EventKey = "event";
     
     public const string TagTypePrefix = "tagType_";
 }

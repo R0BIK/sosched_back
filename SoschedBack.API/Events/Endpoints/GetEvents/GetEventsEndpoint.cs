@@ -24,8 +24,9 @@ public class GetEventsEndpoint : IEndpoint
         .WithRequestValidation<Request>();
 
     public sealed record Request(
-        DateTimeOffset DateFrom,
-        DateTimeOffset DateTo,
+        DateTimeOffset? DateFrom,
+        DateTimeOffset? DateTo,
+        bool? IsPaged = true,
         int? Page = 1,
         int? PageSize = 10,
         string? SortBy = null,
@@ -38,15 +39,21 @@ public class GetEventsEndpoint : IEndpoint
         string Name,
         string? Location,
         string? Description,
-        int CreatorId,
+        User Creator,
         string Color,
-        DateTimeOffset DateStart,
-        DateTimeOffset DateEnd,
-        int? CoordinatorId,
+        DateOnly Date, 
+        TimeSpan TimeStart,    
+        TimeSpan TimeEnd,
+        User? Coordinator,
         int UsersCount
     ) : IUsersCountResponse;
 
-    private static async Task<Ok<Result<PagedList<Response>>>> Handle(
+    private sealed record User(
+        int Id,
+        string FullName
+    );
+
+    private static async Task<Results<Ok<Result<PagedList<Response>>>, Ok<Result<List<Response>>>>> Handle(
         [AsParameters] Request request,
         ISpaceProvider spaceProvider,
         IUserProvider userProvider,
@@ -55,41 +62,71 @@ public class GetEventsEndpoint : IEndpoint
     )
     {
         var spaceId = spaceProvider.GetSpace();
+        bool isPaged = request.IsPaged is true or null;
         
         // var sortedQuery = BuildSortedUsersCountQuery(request, spaceId, database);
 
         var baseQuery = database.Events
             .AsNoTracking()
-            .Where(i => i.SpaceId == spaceId)
-            .Where(i => i.DateStart >= request.DateFrom && i.DateEnd <= request.DateTo);
+            .Where(i => i.SpaceId == spaceId);
+            
+        if (request.DateFrom.HasValue)
+        {
+            baseQuery = baseQuery.Where(i => i.DateStart >= request.DateFrom.Value);
+        }
+        
+        if (request.DateTo.HasValue)
+        {
+            baseQuery = baseQuery.Where(i => i.DateEnd <= request.DateTo.Value);
+        }
 
         if (request.Filter is not null)
         {
             
         }
 
-        var user = userProvider.GetUser();
+        if (!isPaged)
+        {
+            var user = userProvider.GetUser();
+            baseQuery = baseQuery
+                .AsNoTracking()
+                .Where(i => i.EventToSpaceUsers.Any(u => u.SpaceUser.UserId == user.Id));
+        }
 
-        var events = await baseQuery
-            .AsNoTracking()
-            .Where(i => i.EventToSpaceUsers.Any(u => u.SpaceUser.UserId == user.Id))
+        var events = baseQuery
+            .Include(e => e.Creator).ThenInclude(su => su.User)
+            .Include(e => e.Coordinator).ThenInclude(su => su.User)
             .Select(myEvent => new Response(
                 myEvent.Id,
                 myEvent.Name,
                 myEvent.Location,
                 myEvent.Description,
-                myEvent.CreatorId,
+                new User(
+                    myEvent.Creator.User.Id,
+                    (myEvent.Creator.User.LastName + " " + myEvent.Creator.User.FirstName + " " + (myEvent.Creator.User.Patronymic ?? "")).Trim()
+                ),
                 myEvent.Color,
-                myEvent.DateStart,
-                myEvent.DateEnd,
-                myEvent.CoordinatorId,
-                0
-            ))
-            .ToPagedListAsync(request, ct);
+                DateOnly.FromDateTime(myEvent.DateStart.Date),
+                myEvent.DateStart.TimeOfDay,
+                myEvent.DateEnd.TimeOfDay,
+                myEvent.Coordinator != null
+                    ? new User(
+                        myEvent.Coordinator.User.Id,
+                        (myEvent.Coordinator.User.LastName + " " + myEvent.Coordinator.User.FirstName + " " + (myEvent.Coordinator.User.Patronymic ?? "")).Trim()
+                    )
+                    : null,
+                
+                myEvent.EventToSpaceUsers.Count()
+            ));
         
-        var result = Result.Success(events);
+        if (isPaged)
+        {
+            var pagedList = await events.ToPagedListAsync(request, ct);
+            return TypedResults.Ok(Result.Success(pagedList));
+        }
         
-        return TypedResults.Ok(result);
+        var fullList = await events.ToListAsync(ct);
+        return TypedResults.Ok(Result.Success(fullList));
     }
 
     // private static IQueryable<Response> BuildSortedUsersCountQuery(

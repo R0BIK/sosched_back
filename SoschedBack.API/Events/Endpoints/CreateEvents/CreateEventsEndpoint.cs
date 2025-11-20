@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.EntityFrameworkCore;
 using SoschedBack.Common;
 using SoschedBack.Common.Constants;
 using SoschedBack.Common.Extensions;
@@ -58,6 +59,27 @@ public class CreateEventsEndpoint : IEndpoint
         var spaceId = spaceProvider.GetSpace();
         var user = userProvider.GetUser();
         
+        var creatorSpaceUser = await database.SpaceUsers
+            .AsNoTracking()
+            .FirstAsync(
+                su => su.SpaceId == spaceId && su.UserId == user.Id, 
+                cancellationToken
+            );
+        
+        int? coordinatorSpaceUserId = null;
+
+        if (request.CoordinatorId.HasValue)
+        {
+            var coordinatorSpaceUserEntity = await database.SpaceUsers
+                .AsNoTracking()
+                .FirstOrDefaultAsync(
+                    su => su.SpaceId == spaceId && su.UserId == request.CoordinatorId.Value, 
+                    cancellationToken
+                );
+
+            coordinatorSpaceUserId = coordinatorSpaceUserEntity?.Id;
+        }
+        
         var myEvent = new Event
         {
             Name = request.Name.Trim(),
@@ -66,8 +88,8 @@ public class CreateEventsEndpoint : IEndpoint
             Color = request.Color,
             DateStart = request.DateStart,
             DateEnd = request.DateEnd,
-            CoordinatorId = request.CoordinatorId,
-            CreatorId = user.Id,
+            CoordinatorId = coordinatorSpaceUserId, 
+            CreatorId = creatorSpaceUser.Id, 
             SpaceId = spaceId,
         };
 

@@ -6,8 +6,6 @@ public class Event : AuditableEntity, ISpaceEntity
 {
     public int Id { get; set; }
     
-    public int EventTypeId { get; set; }
-    
     public string Name { get; set; } = null!;
     
     public int? CoordinatorId { get; set; }
@@ -26,9 +24,9 @@ public class Event : AuditableEntity, ISpaceEntity
     
     public int SpaceId { get; set; }
     
-    public virtual User Creator { get; set; } = null!;
+    public virtual SpaceUser Creator { get; set; } = null!;
     
-    public virtual User? Coordinator { get; set; }
+    public virtual SpaceUser? Coordinator { get; set; }
     
     public virtual ICollection<EventToSpaceUser> EventToSpaceUsers { get; set; } = new List<EventToSpaceUser>();
     

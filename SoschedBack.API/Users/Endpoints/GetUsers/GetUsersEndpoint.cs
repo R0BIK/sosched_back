@@ -154,6 +154,13 @@ public class GetUsersEndpoint : IEndpoint
             baseQuery = baseQuery
                 .Where(u => u.SpaceUsers.Any(su => (su.TagToSpaceUsers.Any(sut => tags.Contains(sut.Tag.ShortName)))));
         }
+        
+        if (filters.Has(FilterConstants.EventKey))
+        {
+            var events = filters.GetIntValues(FilterConstants.EventKey);
+            baseQuery = baseQuery
+                .Where(u => u.SpaceUsers.Any(su => (su.EventToSpaceUsers.Any(sut => events.Contains(sut.Event.Id)))));
+        }
 
         return baseQuery;
     }

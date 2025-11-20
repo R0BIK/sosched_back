@@ -46,6 +46,10 @@ public class RequestValidator : AbstractValidator<GetUsersEndpoint.Request>
                             {
                                 await ValidateTagsAsync(values, spaceId, dbContext, context, ct);
                             }
+                            else if (key.StartsWith(FilterConstants.EventKey, StringComparison.OrdinalIgnoreCase))
+                            {
+                                await ValidateEventsAsync(parsedFilters.GetIntValues(FilterConstants.EventKey), spaceId, dbContext, context, ct);
+                            }
                             else
                             {
                                 context.AddFailure($"Unknown filter key for this entity: '{key}'.");
@@ -54,6 +58,29 @@ public class RequestValidator : AbstractValidator<GetUsersEndpoint.Request>
                     });
             });
     }
+    private static async Task ValidateEventsAsync(
+        IEnumerable<int> values,
+        int spaceId,
+        SoschedBackDbContext dbContext,
+        CustomContext context,
+        CancellationToken ct)
+    {
+        var existingEvents = await dbContext.Events
+            .AsNoTracking()
+            .Where(t => t.SpaceId == spaceId && values.Contains(t.Id))
+            .Select(t => t.Id)
+            .ToListAsync(ct);
+
+        var invalidEvents = values
+            .Except(existingEvents)
+            .ToArray();
+
+        if (invalidEvents.Length > 0)
+        {
+            context.AddFailure($"Invalid events: {string.Join(", ", invalidEvents)}.");
+        }
+    }
+    
     private static async Task ValidateRolesAsync(
         IEnumerable<string> values,
         int spaceId,
