@@ -21,7 +21,7 @@ public class CreateEventsEndpoint : IEndpoint
     public sealed record RepeatInfo(
         int RepeatNumber,
         string RepeatType,
-        DateTimeOffset RepeatEnd
+        DateOnly RepeatEnd
     );
     
     public sealed record Request(
@@ -29,8 +29,9 @@ public class CreateEventsEndpoint : IEndpoint
         string? Location,
         string? Description,
         string Color,
-        DateTimeOffset DateStart,
-        DateTimeOffset DateEnd,
+        DateOnly Date,
+        TimeSpan TimeStart,  
+        TimeSpan TimeEnd,
         int? CoordinatorId,
         RepeatInfo? RepeatInfo,
         bool Confirmed = false
@@ -42,8 +43,9 @@ public class CreateEventsEndpoint : IEndpoint
         string? Location,
         string? Description,
         string Color,
-        DateTimeOffset DateStart,
-        DateTimeOffset DateEnd,
+        DateOnly Date,
+        TimeSpan TimeStart,  
+        TimeSpan TimeEnd,
         int? CoordinatorId,
         int? RepeatsCount
     );
@@ -72,7 +74,7 @@ public class CreateEventsEndpoint : IEndpoint
         {
             var coordinatorSpaceUserEntity = await database.SpaceUsers
                 .AsNoTracking()
-                .FirstOrDefaultAsync(
+                .FirstAsync(
                     su => su.SpaceId == spaceId && su.UserId == request.CoordinatorId.Value, 
                     cancellationToken
                 );
@@ -80,14 +82,18 @@ public class CreateEventsEndpoint : IEndpoint
             coordinatorSpaceUserId = coordinatorSpaceUserEntity?.Id;
         }
         
+        var datePart = request.Date.ToDateTime(TimeOnly.MinValue); 
+        var dateStartCombined = datePart.Add(request.TimeStart);
+        var dateEndCombined = datePart.Add(request.TimeEnd);
+        
         var myEvent = new Event
         {
             Name = request.Name.Trim(),
             Location = request.Location?.Trim(),
             Description = request.Description?.Trim(),
             Color = request.Color,
-            DateStart = request.DateStart,
-            DateEnd = request.DateEnd,
+            DateStart = dateStartCombined,
+            DateEnd = dateEndCombined, 
             CoordinatorId = coordinatorSpaceUserId, 
             CreatorId = creatorSpaceUser.Id, 
             SpaceId = spaceId,
@@ -104,8 +110,9 @@ public class CreateEventsEndpoint : IEndpoint
                 myEvent.Location,
                 myEvent.Description,
                 myEvent.Color,
-                myEvent.DateStart,
-                myEvent.DateEnd,
+                DateOnly.FromDateTime(myEvent.DateStart.Date),
+                myEvent.DateStart.TimeOfDay,
+                myEvent.DateEnd.TimeOfDay,
                 myEvent.CoordinatorId,
                 null
             );
@@ -123,8 +130,9 @@ public class CreateEventsEndpoint : IEndpoint
             myEvent.Location,
             myEvent.Description,
             myEvent.Color,
-            myEvent.DateStart,
-            myEvent.DateEnd,
+            DateOnly.FromDateTime(myEvent.DateStart.Date),
+            myEvent.DateStart.TimeOfDay,
+            myEvent.DateEnd.TimeOfDay,
             myEvent.CoordinatorId,
             repeats.Count
         );
@@ -142,21 +150,47 @@ public class CreateEventsEndpoint : IEndpoint
     {
         var repeats = new List<Event>();
 
-        DateTimeOffset currentDate = GetNextDate(myEvent.DateStart, repeatInfo.RepeatNumber, repeatInfo.RepeatType);
+        var baseEvent = CloneEventData(myEvent);
+
+        var repeatEndDateTime = repeatInfo.RepeatEnd
+            .ToDateTime(TimeOnly.MaxValue); 
+            
+        var repeatEndOffset = new DateTimeOffset(repeatEndDateTime, myEvent.DateStart.Offset);
         
-        while (currentDate <= repeatInfo.RepeatEnd)
+        DateTimeOffset currentDate = GetNextDate(baseEvent.DateStart, repeatInfo.RepeatNumber, repeatInfo.RepeatType);
+        
+        while (currentDate <= repeatEndOffset)
         {
-            Event nextEvent = myEvent;
+            var nextEvent = CloneEventData(baseEvent); 
             
-            nextEvent.DateStart = GetNextDate(nextEvent.DateStart, repeatInfo.RepeatNumber, repeatInfo.RepeatType);
-            nextEvent.DateEnd = GetNextDate(nextEvent.DateEnd, repeatInfo.RepeatNumber, repeatInfo.RepeatType);
+            nextEvent.DateStart = GetNextDate(baseEvent.DateStart, repeatInfo.RepeatNumber, repeatInfo.RepeatType);
+            nextEvent.DateEnd = GetNextDate(baseEvent.DateEnd, repeatInfo.RepeatNumber, repeatInfo.RepeatType);
             
-            currentDate = GetNextDate(currentDate, repeatInfo.RepeatNumber, repeatInfo.RepeatType);
+            baseEvent.DateStart = nextEvent.DateStart;
+            baseEvent.DateEnd = nextEvent.DateEnd;
+
+            currentDate = nextEvent.DateStart;
             
             repeats.Add(nextEvent);
         }
         
         return repeats;
+    }
+    
+    private static Event CloneEventData(Event source)
+    {
+        return new Event
+        {
+            Name = source.Name,
+            Location = source.Location,
+            Description = source.Description,
+            Color = source.Color,
+            CoordinatorId = source.CoordinatorId,
+            CreatorId = source.CreatorId,
+            SpaceId = source.SpaceId,
+            DateStart = source.DateStart,
+            DateEnd = source.DateEnd
+        };
     }
 
     private static DateTimeOffset GetNextDate(DateTimeOffset date, int number, string type)
