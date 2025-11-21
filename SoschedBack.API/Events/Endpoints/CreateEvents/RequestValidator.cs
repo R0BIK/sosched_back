@@ -35,15 +35,14 @@ public class RequestValidator : AbstractValidator<CreateEventsEndpoint.Request>
                     .When(x => x.CoordinatorId.HasValue);
             });
 
-        RuleFor(r => r.Date)
-            .MustBeValidDate();
-
-        RuleFor(r => r.TimeStart)
-            .LessThan(x => x.TimeEnd)
+        RuleFor(r => r.DateStart)
+            .MustBeValidDate()
+            .LessThan(x => x.DateEnd)
             .WithMessage("DateStart must be earlier than DateEnd.");
         
-        RuleFor(r => r.TimeEnd)
-            .GreaterThan(x => x.TimeStart)
+        RuleFor(r => r.DateEnd)
+            .MustBeValidDate()
+            .GreaterThan(x => x.DateStart)
             .WithMessage("DateEnd must be later than DateStart.");
         
         RuleFor(x => x.RepeatInfo)
@@ -66,22 +65,20 @@ public class RequestValidator : AbstractValidator<CreateEventsEndpoint.Request>
             .When(x => x.RepeatInfo != null);
 
         RuleFor(x => x.RepeatInfo!.RepeatEnd)
-            .GreaterThan(x => x.Date)
+            .GreaterThan(x => x.DateEnd)
             .WithMessage("RepeatEnd must be after DateEnd.")
             .When(x => x.RepeatInfo != null);
 
         RuleFor(x => x)
             .CustomAsync(async (request, context, cancellationToken) =>
             {
-                if (!IsSuccessfulValidation(request)) return;
+                // if (!IsSuccessfulValidation(request)) return;
                 
                 var name = request.Name.Trim();
                 var location = request.Location?.Trim();
                 var coordinatorId = request.CoordinatorId;
-                
-                var datePart = request.Date.ToDateTime(TimeOnly.MinValue); 
-                var dateStartCombined = datePart.Add(request.TimeStart);
-                var dateEndCombined = datePart.Add(request.TimeEnd);
+                var dateStart = request.DateStart;
+                var dateEnd = request.DateEnd;
 
                 var exists = await database.Events
                     .AsNoTracking()
@@ -89,8 +86,8 @@ public class RequestValidator : AbstractValidator<CreateEventsEndpoint.Request>
                             e.SpaceId == spaceId &&
                             e.Name == name &&
                             e.Location == location &&
-                            e.DateStart == dateStartCombined &&
-                            e.DateEnd == dateEndCombined &&
+                            e.DateStart == dateStart &&
+                            e.DateEnd == dateEnd &&
                             e.CoordinatorId == coordinatorId,
                         cancellationToken);
 
@@ -108,11 +105,13 @@ public class RequestValidator : AbstractValidator<CreateEventsEndpoint.Request>
         validator.RuleFor(x => x.Name).MustBeValidTitle();
         validator.RuleFor(x => x.Color).MustBeValidString();
 
-        validator.RuleFor(x => x.TimeStart)
-            .LessThan(x => x.TimeEnd);
+        validator.RuleFor(x => x.DateStart)
+            .MustBeValidDate()
+            .LessThan(x => x.DateEnd);
 
-        validator.RuleFor(x => x.TimeEnd)
-            .GreaterThan(x => x.TimeStart);
+        validator.RuleFor(x => x.DateEnd)
+            .MustBeValidDate()
+            .GreaterThan(x => x.DateStart);
 
         validator.RuleFor(x => x.CoordinatorId)
             .MustBeValidOptionalId();

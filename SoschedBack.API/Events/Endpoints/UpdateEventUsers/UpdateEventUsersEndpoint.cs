@@ -30,14 +30,16 @@ public class UpdateEventUsersEndpoint : IEndpoint
         CancellationToken ct)
     {
         var spaceId = spaceProvider.GetSpace();
-        var eventId = parameters.EventId;
-        
-        await AddUsersHandler(spaceId, eventId, body.UsersToAdd, body.TagsToAddUsersFrom, db, ct);
+        var eventIds = new List<int>();
 
-        if (body.UsersToRemove is { Count: > 0 })
-        {
-            await RemoveUsers(spaceId, eventId, body.UsersToRemove, db, ct);
-        }
+        if (body.EventIds is { Count: > 0 })
+            eventIds.AddRange(body.EventIds);
+        else
+            eventIds.Add(parameters.EventId);
+        
+        await AddUsersHandler(spaceId, eventIds, body.UsersToAdd, body.TagsToAddUsersFrom, db, ct);
+
+        await RemoveUsers(spaceId, eventIds, body.UsersToRemove, db, ct);
 
         await db.SaveChangesAsync(ct);
 
@@ -46,7 +48,7 @@ public class UpdateEventUsersEndpoint : IEndpoint
     
     private static async Task AddUsersHandler(
         int spaceId,
-        int targetEventId,
+        List<int> targetEventIds,
         List<int>? usersToAdd,
         List<int>? tagsToAddUsersFrom,
         SoschedBackDbContext db,
@@ -78,26 +80,36 @@ public class UpdateEventUsersEndpoint : IEndpoint
         allSpaceUserIdsToAdd.UnionWith(spaceUserIdsFromTags);
 
         if (allSpaceUserIdsToAdd.Count == 0)
-        {
             return;
-        }
         
-        var existingSpaceUserIds = await db.EventToSpaceUsers
-            .AsNoTracking()
-            .Where(esu => esu.EventId == targetEventId && allSpaceUserIdsToAdd.Contains(esu.SpaceUserId))
-            .Select(esu => esu.SpaceUserId)
-            .ToListAsync(ct);
-        
-        var existingSet = new HashSet<int>(existingSpaceUserIds);
+        var spaceUserIds = allSpaceUserIdsToAdd.ToList();
 
-        var newRelations = allSpaceUserIdsToAdd
-            .Where(id => !existingSet.Contains(id))
-            .Select(id => new EventToSpaceUser 
+        var existingRelations = await db.EventToSpaceUsers
+            .AsNoTracking()
+            .Where(esu => 
+                targetEventIds.Contains(esu.EventId) && 
+                spaceUserIds.Contains(esu.SpaceUserId)
+            )
+            .Select(esu => new { esu.EventId, esu.SpaceUserId })
+            .ToListAsync(ct);
+
+        var existingSet = existingRelations.ToHashSet();
+        var newRelations = new List<EventToSpaceUser>();
+
+        foreach (var eventId in targetEventIds)
+        {
+            foreach (var spaceUserId in spaceUserIds)
             {
-                EventId = targetEventId,
-                SpaceUserId = id
-            })
-            .ToList();
+                if (!existingSet.Contains(new { EventId = eventId, SpaceUserId = spaceUserId }))
+                {
+                    newRelations.Add(new EventToSpaceUser 
+                    {
+                        EventId = eventId,
+                        SpaceUserId = spaceUserId
+                    });
+                }
+            }
+        }
 
         if (newRelations.Count > 0)
         {
@@ -107,11 +119,14 @@ public class UpdateEventUsersEndpoint : IEndpoint
     
     private static async Task RemoveUsers(
         int spaceId,
-        int eventId,
-        List<int> userIds,
+        List<int> eventIds, 
+        List<int>? userIds,
         SoschedBackDbContext db,
         CancellationToken ct)
     {
+        if (userIds is not { Count: > 0 } || eventIds.Count == 0)
+            return;
+        
         var spaceUserIds = await db.SpaceUsers
             .AsNoTracking()
             .Where(su => su.SpaceId == spaceId && userIds.Contains(su.UserId))
@@ -122,7 +137,10 @@ public class UpdateEventUsersEndpoint : IEndpoint
             return;
         
         var relationsToRemove = await db.EventToSpaceUsers
-            .Where(esu => esu.EventId == eventId && spaceUserIds.Contains(esu.SpaceUserId))
+            .Where(esu => 
+                eventIds.Contains(esu.EventId) && 
+                spaceUserIds.Contains(esu.SpaceUserId)
+            )
             .ToListAsync(ct);
 
         if (relationsToRemove.Count > 0)
@@ -134,6 +152,7 @@ public class UpdateEventUsersEndpoint : IEndpoint
     public sealed record RequestParameters(int EventId); 
 
     public sealed record RequestBody(
+        [property: JsonPropertyName("eventIds")] List<int>? EventIds,
         [property: JsonPropertyName("add")] List<int>? UsersToAdd,
         [property: JsonPropertyName("remove")] List<int>? UsersToRemove,
         [property: JsonPropertyName("addFromTags")] List<int>? TagsToAddUsersFrom

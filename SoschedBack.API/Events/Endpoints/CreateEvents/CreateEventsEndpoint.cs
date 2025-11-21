@@ -21,7 +21,7 @@ public class CreateEventsEndpoint : IEndpoint
     public sealed record RepeatInfo(
         int RepeatNumber,
         string RepeatType,
-        DateOnly RepeatEnd
+        DateTimeOffset RepeatEnd
     );
     
     public sealed record Request(
@@ -29,9 +29,8 @@ public class CreateEventsEndpoint : IEndpoint
         string? Location,
         string? Description,
         string Color,
-        DateOnly Date,
-        TimeSpan TimeStart,  
-        TimeSpan TimeEnd,
+        DateTimeOffset DateStart,
+        DateTimeOffset DateEnd, 
         int? CoordinatorId,
         RepeatInfo? RepeatInfo,
         bool Confirmed = false
@@ -43,9 +42,8 @@ public class CreateEventsEndpoint : IEndpoint
         string? Location,
         string? Description,
         string Color,
-        DateOnly Date,
-        TimeSpan TimeStart,  
-        TimeSpan TimeEnd,
+        DateTimeOffset DateStart,
+        DateTimeOffset DateEnd,  
         int? CoordinatorId,
         int? RepeatsCount
     );
@@ -74,7 +72,7 @@ public class CreateEventsEndpoint : IEndpoint
         {
             var coordinatorSpaceUserEntity = await database.SpaceUsers
                 .AsNoTracking()
-                .FirstAsync(
+                .FirstOrDefaultAsync(
                     su => su.SpaceId == spaceId && su.UserId == request.CoordinatorId.Value, 
                     cancellationToken
                 );
@@ -82,18 +80,14 @@ public class CreateEventsEndpoint : IEndpoint
             coordinatorSpaceUserId = coordinatorSpaceUserEntity?.Id;
         }
         
-        var datePart = request.Date.ToDateTime(TimeOnly.MinValue); 
-        var dateStartCombined = datePart.Add(request.TimeStart);
-        var dateEndCombined = datePart.Add(request.TimeEnd);
-        
         var myEvent = new Event
         {
             Name = request.Name.Trim(),
             Location = request.Location?.Trim(),
             Description = request.Description?.Trim(),
             Color = request.Color,
-            DateStart = dateStartCombined,
-            DateEnd = dateEndCombined, 
+            DateStart = request.DateStart,
+            DateEnd = request.DateEnd,   
             CoordinatorId = coordinatorSpaceUserId, 
             CreatorId = creatorSpaceUser.Id, 
             SpaceId = spaceId,
@@ -103,6 +97,12 @@ public class CreateEventsEndpoint : IEndpoint
         {
             await database.Events.AddAsync(myEvent, cancellationToken);
             await database.SaveChangesAsync(cancellationToken);
+            
+            if (coordinatorSpaceUserId.HasValue)
+            {
+                await AddCoordinatorParticipation(database, myEvent.Id, coordinatorSpaceUserId.Value, cancellationToken);
+                await database.SaveChangesAsync(cancellationToken); 
+            }
         
             var response = new Response(
                 myEvent.Id,
@@ -110,9 +110,8 @@ public class CreateEventsEndpoint : IEndpoint
                 myEvent.Location,
                 myEvent.Description,
                 myEvent.Color,
-                DateOnly.FromDateTime(myEvent.DateStart.Date),
-                myEvent.DateStart.TimeOfDay,
-                myEvent.DateEnd.TimeOfDay,
+                myEvent.DateStart,
+                myEvent.DateEnd,
                 myEvent.CoordinatorId,
                 null
             );
@@ -130,9 +129,8 @@ public class CreateEventsEndpoint : IEndpoint
             myEvent.Location,
             myEvent.Description,
             myEvent.Color,
-            DateOnly.FromDateTime(myEvent.DateStart.Date),
-            myEvent.DateStart.TimeOfDay,
-            myEvent.DateEnd.TimeOfDay,
+            myEvent.DateStart,
+            myEvent.DateEnd,
             myEvent.CoordinatorId,
             repeats.Count
         );
@@ -142,8 +140,44 @@ public class CreateEventsEndpoint : IEndpoint
         
         await database.Events.AddRangeAsync(repeats, cancellationToken);
         await database.SaveChangesAsync(cancellationToken);
+        
+        var eventIds = repeats.Select(e => e.Id).ToList();
+        
+        if (coordinatorSpaceUserId.HasValue)
+        {
+            await AddCoordinatorParticipationToMultipleEvents(database, eventIds, coordinatorSpaceUserId.Value, cancellationToken);
+            await database.SaveChangesAsync(cancellationToken);
+        }
 
         return TypedResults.Ok(Result.Success(preview));
+    }
+    
+    private static async Task AddCoordinatorParticipation(
+        SoschedBackDbContext database, 
+        int eventId, 
+        int spaceUserId, 
+        CancellationToken cancellationToken)
+    {
+        var participation = new EventToSpaceUser
+        {
+            EventId = eventId,
+            SpaceUserId = spaceUserId
+        };
+        await database.EventToSpaceUsers.AddAsync(participation, cancellationToken);
+    }
+    
+    private static async Task AddCoordinatorParticipationToMultipleEvents(
+        SoschedBackDbContext database, 
+        IEnumerable<int> eventIds, 
+        int spaceUserId, 
+        CancellationToken cancellationToken)
+    {
+        var participations = eventIds.Select(id => new EventToSpaceUser
+        {
+            EventId = id,
+            SpaceUserId = spaceUserId
+        }).ToList();
+        await database.EventToSpaceUsers.AddRangeAsync(participations, cancellationToken);
     }
 
     private static List<Event> GenerateRepeats(RepeatInfo repeatInfo, Event myEvent)
@@ -152,10 +186,8 @@ public class CreateEventsEndpoint : IEndpoint
 
         var baseEvent = CloneEventData(myEvent);
 
-        var repeatEndDateTime = repeatInfo.RepeatEnd
-            .ToDateTime(TimeOnly.MaxValue); 
-            
-        var repeatEndOffset = new DateTimeOffset(repeatEndDateTime, myEvent.DateStart.Offset);
+        // ИСПРАВЛЕНО: Сравнение DateTimeOffset с DateTimeOffset
+        DateTimeOffset repeatEndOffset = repeatInfo.RepeatEnd; 
         
         DateTimeOffset currentDate = GetNextDate(baseEvent.DateStart, repeatInfo.RepeatNumber, repeatInfo.RepeatType);
         

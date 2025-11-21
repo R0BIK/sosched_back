@@ -74,14 +74,16 @@ public static class FluentValidationExtensions
             .WithMessage($"{typeof(TEntity).Name}'s ID is invalid.");
     }
     
-    public static IRuleBuilderOptions<T, DateOnly> MustBeValidDate<T>(
-        this IRuleBuilder<T, DateOnly> ruleBuilder) 
+    public static IRuleBuilderOptions<T, DateTimeOffset> MustBeValidDate<T>(
+        this IRuleBuilder<T, DateTimeOffset> ruleBuilder) 
+        where T : class
     {
         return ruleBuilder
-            .Must(date => date >= DateOnly.FromDateTime(DateTime.UtcNow))
+            .NotNull()
+            .GreaterThanOrEqualTo(DateTimeOffset.UtcNow)
             .WithMessage("Date cannot be in the past.")
-            .Must(date => date <= DateOnly.FromDateTime(DateTime.UtcNow.AddYears(2)))
-            .WithMessage("Date cannot be later than 2 years from now.");
+            .LessThanOrEqualTo(_ => DateTimeOffset.UtcNow.AddYears(2))
+            .WithMessage("DateEnd cannot be later than 2 years from now.");
     }
     
     public static IRuleBuilderOptions<T, string> MustBeValidRepeatType<T>(

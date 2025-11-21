@@ -41,9 +41,8 @@ public class GetEventsEndpoint : IEndpoint
         string? Description,
         User Creator,
         string Color,
-        DateOnly Date, 
-        TimeSpan TimeStart,    
-        TimeSpan TimeEnd,
+        DateTimeOffset DateStart, // <-- ВОЗВРАТ
+        DateTimeOffset DateEnd,   // <-- ВОЗВРАТ
         User? Coordinator,
         int UsersCount
     ) : IUsersCountResponse;
@@ -69,6 +68,8 @@ public class GetEventsEndpoint : IEndpoint
         var baseQuery = database.Events
             .AsNoTracking()
             .Where(i => i.SpaceId == spaceId);
+        
+        Console.WriteLine("MyLog:" + request.DateTo);
             
         if (request.DateFrom.HasValue)
         {
@@ -106,9 +107,8 @@ public class GetEventsEndpoint : IEndpoint
                     (myEvent.Creator.User.LastName + " " + myEvent.Creator.User.FirstName + " " + (myEvent.Creator.User.Patronymic ?? "")).Trim()
                 ),
                 myEvent.Color,
-                DateOnly.FromDateTime(myEvent.DateStart.Date),
-                myEvent.DateStart.TimeOfDay,
-                myEvent.DateEnd.TimeOfDay,
+                myEvent.DateStart, 
+                myEvent.DateEnd,
                 myEvent.Coordinator != null
                     ? new User(
                         myEvent.Coordinator.User.Id,

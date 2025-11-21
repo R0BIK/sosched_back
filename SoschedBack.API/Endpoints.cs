@@ -5,8 +5,11 @@ using SoschedBack.Auth.Endpoints.Register;
 using SoschedBack.Common;
 using SoschedBack.Common.Filters;
 using SoschedBack.Events.Endpoints.CreateEvents;
+using SoschedBack.Events.Endpoints.DeleteEvent;
 using SoschedBack.Events.Endpoints.GetEventById;
 using SoschedBack.Events.Endpoints.GetEvents;
+using SoschedBack.Events.Endpoints.UpdateEvent;
+using SoschedBack.Events.Endpoints.UpdateEventUsers;
 using SoschedBack.Permissions.Endpoints.GetPermissionById;
 using SoschedBack.Permissions.Endpoints.GetPermissions;
 using SoschedBack.Roles.Endpoints.CreateRoles;
@@ -54,6 +57,9 @@ public static class Endpoints
         endpoints.MapEndpoint<CreateEventsEndpoint>();
         endpoints.MapEndpoint<GetEventsEndpoint>();
         endpoints.MapEndpoint<GetEventByIdEndpoint>();
+        endpoints.MapEndpoint<UpdateEventEndpoint>();
+        endpoints.MapEndpoint<DeleteEventByIdEndpoint>();
+        endpoints.MapEndpoint<UpdateEventUsersEndpoint>();
     }
     
     private static void MapSearchEndpoints(this IEndpointRouteBuilder app)
