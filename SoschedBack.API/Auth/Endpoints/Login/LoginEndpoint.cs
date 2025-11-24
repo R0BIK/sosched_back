@@ -28,8 +28,7 @@ public class LoginEndpoint : IEndpoint
 
         if (result.IsFailure || result.Data == null)
         {
-            var error = Error.From("Unauthorized", "UNAUTHORIZED");
-            return TypedResults.Ok(Result.Failure<Response>(error));
+            return TypedResults.Ok(Result.Failure<Response>(result.Error));
         }
 
         var response = new Response(

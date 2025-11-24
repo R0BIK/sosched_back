@@ -8,6 +8,7 @@ public class RequestBodyValidator : AbstractValidator<UpdateTagUsersEndpoint.Req
 {
     public RequestBodyValidator(SoschedBackDbContext database)
     {
-        
+        //TODO: Validator
+
     }
 }

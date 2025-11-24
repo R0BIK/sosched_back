@@ -9,8 +9,6 @@ namespace SoschedBack.Common.Extensions;
 
 public static class FluentValidationExtensions
 {
-    
-    //TODO: Check validation for my project
     public static IRuleBuilderOptions<T, string> MustBeValidString<T>(
         this IRuleBuilder<T, string> ruleBuilder)
         where T : class
@@ -104,6 +102,25 @@ public static class FluentValidationExtensions
             .WithMessage($"RepeatType must be one of the following: {string.Join(", ", validTypes)}");
     }
     
+    public static IRuleBuilderOptions<T, string> MustBeUniqueEmail<T>(
+        this IRuleBuilder<T, string> ruleBuilder,
+        SoschedBackDbContext dbContext)
+        where T : class
+    {
+        return ruleBuilder
+            .MustAsync(async (email, cancellationToken) =>
+            {
+                var emailExists = await dbContext.Users
+                    .AsNoTracking()
+                    .AnyAsync(u => u.Email == email, cancellationToken);
+
+                return !emailExists;
+
+            })
+            .WithMessage("EMAIL_ALREADY_EXISTS");
+            // .WithMessage("User with this email already exists.");
+    }
+    
     public static IRuleBuilderOptions<T, string> MustBeValidTitle<T>(
         this IRuleBuilder<T, string> ruleBuilder) 
         where T : class
@@ -131,6 +148,7 @@ public static class FluentValidationExtensions
         return ruleBuilder
             .MustBeValidString()
             .WithMessage("Email contains invalid characters.")
+            .WithErrorCode("EMAIL_CONTAINS_INVALID_CHARACTERS")
             .ApplyRegexPattern(RegexPatterns.Pattern.Email);
     }
 
@@ -140,7 +158,8 @@ public static class FluentValidationExtensions
     {
         return ruleBuilder
             .MustBeValidString()
-            .WithMessage("Password contains invalid characters.")
+            // .WithMessage("Password contains invalid characters.")
+            .WithMessage("PASSWORD_CONTAINS_INVALID_CHARACTERS")
             .ApplyRegexPattern(RegexPatterns.Pattern.Password);
     }
     
@@ -150,7 +169,8 @@ public static class FluentValidationExtensions
     {
         return ruleBuilder
             .MustBeValidString()
-            .WithMessage("Name contains invalid characters.")
+            .WithMessage("INVALID_NAME")
+            // .WithMessage("Name contains invalid characters.")
             .ApplyRegexPattern(RegexPatterns.Pattern.Name);
     }
     

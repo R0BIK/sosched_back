@@ -30,12 +30,23 @@ public class TokenHandlerService : ITokenHandlerService
     public async Task<Result<User>> Login(string login, string password, bool rememberMe)
     {
         var user = await FindUser(login);
-        if (user == null || !ValidatePassword(user, password))
+        if (user == null)
         {
             var error = Error.From(
-                "Invalid login or password.",
-                "INVALID_CREDENTIALS"
+                "Invalid login.",
+                "INVALID_LOGIN"
             );
+            
+            return Result.Failure<User>(error);
+        }
+            
+        if (!ValidatePassword(user, password))
+        {
+            var error = Error.From(
+                "Invalid password.",
+                "INVALID_PASSWORD"
+            );
+            
             return Result.Failure<User>(error);
         }
 

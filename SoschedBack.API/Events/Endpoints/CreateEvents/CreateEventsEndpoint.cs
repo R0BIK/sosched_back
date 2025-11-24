@@ -45,7 +45,7 @@ public class CreateEventsEndpoint : IEndpoint
         DateTimeOffset DateStart,
         DateTimeOffset DateEnd,  
         int? CoordinatorId,
-        int? RepeatsCount
+        List<int>? EventIds
     );
 
     private static async Task<Ok<Result<Response>>> Handle(
@@ -132,24 +132,39 @@ public class CreateEventsEndpoint : IEndpoint
             myEvent.DateStart,
             myEvent.DateEnd,
             myEvent.CoordinatorId,
-            repeats.Count
+            null
         );
         
         if (!request.Confirmed)
             return TypedResults.Ok(Result.Success(preview));
         
-        await database.Events.AddRangeAsync(repeats, cancellationToken);
+        var eventsToSave = repeats;
+        eventsToSave.Insert(0, myEvent);
+        
+        await database.Events.AddRangeAsync(eventsToSave, cancellationToken);
         await database.SaveChangesAsync(cancellationToken);
         
-        var eventIds = repeats.Select(e => e.Id).ToList();
+        var savedEventIds = eventsToSave.Select(e => e.Id).ToList();
         
         if (coordinatorSpaceUserId.HasValue)
         {
-            await AddCoordinatorParticipationToMultipleEvents(database, eventIds, coordinatorSpaceUserId.Value, cancellationToken);
+            await AddCoordinatorParticipationToMultipleEvents(database, savedEventIds, coordinatorSpaceUserId.Value, cancellationToken);
             await database.SaveChangesAsync(cancellationToken);
         }
 
-        return TypedResults.Ok(Result.Success(preview));
+        var finalResponse = new Response(
+            myEvent.Id,
+            myEvent.Name,
+            myEvent.Location,
+            myEvent.Description,
+            myEvent.Color,
+            myEvent.DateStart,
+            myEvent.DateEnd,
+            myEvent.CoordinatorId,
+            savedEventIds
+        );
+
+        return TypedResults.Ok(Result.Success(finalResponse));
     }
     
     private static async Task AddCoordinatorParticipation(
@@ -186,7 +201,6 @@ public class CreateEventsEndpoint : IEndpoint
 
         var baseEvent = CloneEventData(myEvent);
 
-        // ИСПРАВЛЕНО: Сравнение DateTimeOffset с DateTimeOffset
         DateTimeOffset repeatEndOffset = repeatInfo.RepeatEnd; 
         
         DateTimeOffset currentDate = GetNextDate(baseEvent.DateStart, repeatInfo.RepeatNumber, repeatInfo.RepeatType);

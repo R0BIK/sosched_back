@@ -41,8 +41,8 @@ public class GetEventsEndpoint : IEndpoint
         string? Description,
         User Creator,
         string Color,
-        DateTimeOffset DateStart, // <-- ВОЗВРАТ
-        DateTimeOffset DateEnd,   // <-- ВОЗВРАТ
+        DateTimeOffset DateStart,
+        DateTimeOffset DateEnd,  
         User? Coordinator,
         int UsersCount
     ) : IUsersCountResponse;
@@ -69,8 +69,6 @@ public class GetEventsEndpoint : IEndpoint
             .AsNoTracking()
             .Where(i => i.SpaceId == spaceId);
         
-        Console.WriteLine("MyLog:" + request.DateTo);
-            
         if (request.DateFrom.HasValue)
         {
             baseQuery = baseQuery.Where(i => i.DateStart >= request.DateFrom.Value);

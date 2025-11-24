@@ -7,6 +7,7 @@ public class RequestBodyValidator : AbstractValidator<UpdateSpaceUsersEndpoint.R
 {
     public RequestBodyValidator(SoschedBackDbContext database)
     {
-        
+        //TODO: Validator
+
     }
 }

@@ -8,6 +8,6 @@ public class RequestValidator : AbstractValidator<GetTagsEndpoint.Request>
 {
     public RequestValidator()
     {
-        
+        //TODO: Validator
     }
 }
