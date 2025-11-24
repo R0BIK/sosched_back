@@ -21,7 +21,9 @@ public class GetSpaceByIdEndpoint : IEndpoint
     private sealed record Response(
         int Id,
         string Name,
-        string Domain
+        string Domain,
+        string? Password,
+        bool IsPublic
     );
 
     private static async Task<Ok<Result<Response>>> Handle(
@@ -37,7 +39,9 @@ public class GetSpaceByIdEndpoint : IEndpoint
         var response = new Response(
             space.Id,
             space.Name,
-            space.Domain
+            space.Domain,
+            space.Password,
+            space.IsPublic
         );
         
         var result = Result.Success(response);

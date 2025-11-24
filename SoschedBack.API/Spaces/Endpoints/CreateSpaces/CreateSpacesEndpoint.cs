@@ -19,7 +19,9 @@ public class CreateSpacesEndpoint : IEndpoint
     
     public sealed record Request(
         string Name,
-        string Domain
+        string Domain,
+        string? Password,
+        bool IsPublic = false
     );
     
     private sealed record Response(
@@ -40,7 +42,9 @@ public class CreateSpacesEndpoint : IEndpoint
         var space = new Space
         {
             Name = request.Name.Trim(),
-            Domain = request.Domain.Trim()
+            Domain = request.Domain.Trim(),
+            Password = request.Password,
+            IsPublic = request.IsPublic
         };
 
         await database.Spaces.AddAsync(space, cancellationToken);

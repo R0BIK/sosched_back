@@ -11,6 +11,10 @@ public class Space : AuditableEntity, IEntity
     
     public string Domain { get; set; } = null!;
     
+    public string? Password { get; set; }
+
+    public bool IsPublic { get; set; } = false;
+    
     public virtual ICollection<Tag> Tags { get; set; } = new List<Tag>();
     
     public virtual ICollection<Role> Roles { get; set; } = new List<Role>();

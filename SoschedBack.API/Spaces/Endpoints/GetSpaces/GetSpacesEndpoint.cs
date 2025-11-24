@@ -28,7 +28,9 @@ public class GetSpacesEndpoint : IEndpoint
     private sealed record Response(
         int Id,
         string Name,
-        string Domain
+        string Domain,
+        string? Password,
+        bool IsPublic
     );
 
     private static async Task<Ok<Result<PagedList<Response>>>> Handle(
@@ -46,7 +48,9 @@ public class GetSpacesEndpoint : IEndpoint
             .Select(space => new Response(
                 space.Id,
                 space.Name,
-                space.Domain
+                space.Domain,
+                space.Password,
+                space.IsPublic
             ))
             .ToPagedListAsync(request, ct);
         
