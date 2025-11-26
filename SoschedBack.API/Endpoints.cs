@@ -15,10 +15,14 @@ using SoschedBack.Permissions.Endpoints.GetPermissions;
 using SoschedBack.Roles.Endpoints.CreateRoles;
 using SoschedBack.Roles.Endpoints.GetRoleById;
 using SoschedBack.Roles.Endpoints.GetRoles;
+using SoschedBack.Roles.Endpoints.UpdateRoleUsers;
 using SoschedBack.Search.SearchUsersAndTags;
 using SoschedBack.Spaces.Endpoints.CreateSpaces;
 using SoschedBack.Spaces.Endpoints.GetSpaceById;
 using SoschedBack.Spaces.Endpoints.GetSpaces;
+using SoschedBack.Spaces.Endpoints.JoinSpace;
+using SoschedBack.Spaces.Endpoints.UpdateSpace;
+using SoschedBack.Spaces.Endpoints.UpdateSpaceUsers;
 using SoschedBack.Tags.Endpoints.CreateTags;
 using SoschedBack.Tags.Endpoints.DeleteTag;
 using SoschedBack.Tags.Endpoints.GetTagById;
@@ -29,8 +33,10 @@ using SoschedBack.TagTypes.Endpoints.CreateTagTypes;
 using SoschedBack.TagTypes.Endpoints.DeleteTagType;
 using SoschedBack.TagTypes.Endpoints.GetTagTypeById;
 using SoschedBack.TagTypes.Endpoints.GetTagTypes;
+using SoschedBack.TagTypes.Endpoints.UpdateTagType;
 using SoschedBack.Users.Endpoints.GetUserById;
 using SoschedBack.Users.Endpoints.GetUsers;
+using SoschedBack.Users.Endpoints.UpdateUser;
 
 namespace SoschedBack;
 
@@ -98,6 +104,8 @@ public static class Endpoints
         endpoints.MapEndpoint<GetRolesEndpoint>();
         endpoints.MapEndpoint<GetRoleByIdEndpoint>();
         endpoints.MapEndpoint<CreateRolesEndpoint>();
+        endpoints.MapEndpoint<UpdateRoleUsersEndpoint>();
+
     }
     
     private static void MapSpaceEndpoints(this IEndpointRouteBuilder app)
@@ -109,6 +117,10 @@ public static class Endpoints
         endpoints.MapEndpoint<GetSpacesEndpoint>();
         endpoints.MapEndpoint<GetSpaceByIdEndpoint>();
         endpoints.MapEndpoint<CreateSpacesEndpoint>();
+        endpoints.MapEndpoint<UpdateSpacesEndpoint>();
+        endpoints.MapEndpoint<UpdateSpaceUsersEndpoint>();
+        endpoints.MapEndpoint<JoinSpaceEndpoint>();
+
     }
 
     private static void MapTagEndpoints(this IEndpointRouteBuilder app)
@@ -131,6 +143,8 @@ public static class Endpoints
 
         endpoints.MapEndpoint<GetUsersEndpoint>();
         endpoints.MapEndpoint<GetUserByIdEndpoint>();
+        endpoints.MapEndpoint<UpdateUserEndpoint>();
+
     }
 
     private static void MapTagTypeEndpoints(this IEndpointRouteBuilder app)
@@ -142,6 +156,8 @@ public static class Endpoints
         endpoints.MapEndpoint<GetTagTypeByIdEndpoint>();
         endpoints.MapEndpoint<CreateTagTypesEndpoint>();
         endpoints.MapEndpoint<DeleteTagTypeByIdEndpoint>();
+        endpoints.MapEndpoint<UpdateTagTypeEndpoint>();
+
     }
 
     private static RouteGroupBuilder MapSpaceDomainGroup(this IEndpointRouteBuilder app, string route)

@@ -1,4 +1,3 @@
-using System.Reflection.Metadata;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
@@ -6,7 +5,6 @@ using Microsoft.EntityFrameworkCore;
 using SoschedBack.Common;
 using SoschedBack.Common.Constants;
 using SoschedBack.Common.Extensions;
-using SoschedBack.Common.Http;
 using SoschedBack.Core.Common.UnifiedResponse;
 using SoschedBack.Core.Models;
 using SoschedBack.Storage;
@@ -18,18 +16,22 @@ public class UpdateSpaceUsersEndpoint : IEndpoint
     public static IEndpointConventionBuilder Map(IEndpointRouteBuilder app)
     {
         return app
-            .MapPatch("/", Handle)
+            .MapPatch("/{spaceId:int}/users", Handle)
+            .WithRequestValidation<RequestParameters>()
             .WithRequestValidation<RequestBody>()
-            .WithSummary("Updates users inside the current space");
+            .WithSummary("Updates users inside the specified space");
     }
 
+    // ДОБАВЛЕНО: RequestParameters для получения ID пространства из URL
+    public sealed record RequestParameters(int SpaceId);
+
     private static async Task<Ok<Result<string>>> Handle(
+        [AsParameters] RequestParameters parameters,
         [FromBody] RequestBody body,
         SoschedBackDbContext db,
-        ISpaceProvider spaceProvider,
         CancellationToken ct)
     {
-        var spaceId = spaceProvider.GetSpace();
+        var spaceId = parameters.SpaceId;
         
         if (body.UsersToAdd is not null)
         {
@@ -85,7 +87,6 @@ public class UpdateSpaceUsersEndpoint : IEndpoint
         }).ToList();
 
         await db.SpaceUsers.AddRangeAsync(newSpaceUsers, cancellationToken);
-        await db.SaveChangesAsync(cancellationToken);
     }
     
     private static async Task RemoveUsers(
@@ -102,7 +103,6 @@ public class UpdateSpaceUsersEndpoint : IEndpoint
             return;
 
         db.SpaceUsers.RemoveRange(spaceUsersToRemove);
-        await db.SaveChangesAsync(cancellationToken);
     }
 
     public sealed record RequestBody(

@@ -27,7 +27,9 @@ public class CreateSpacesEndpoint : IEndpoint
     private sealed record Response(
         int Id,
         string Name,
-        string Domain
+        string Domain,
+        string? Password,
+        bool IsPublic
     );
 
     private static async Task<Ok<Result<Response>>> Handle(
@@ -53,7 +55,7 @@ public class CreateSpacesEndpoint : IEndpoint
         await CreateDefaultRolesAsync(space.Id, database, cancellationToken);
         await AddCreatorAsAdminAsync(space.Id, user.Id, database, cancellationToken);
         
-        var response = new Response(space.Id, space.Name, space.Domain);
+        var response = new Response(space.Id, space.Name, space.Domain, space.Password, space.IsPublic);
         
         var result = Result.Success(response);
         
