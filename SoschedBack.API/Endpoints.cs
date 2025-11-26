@@ -117,7 +117,7 @@ public static class Endpoints
         endpoints.MapEndpoint<GetSpacesEndpoint>();
         endpoints.MapEndpoint<GetSpaceByIdEndpoint>();
         endpoints.MapEndpoint<CreateSpacesEndpoint>();
-        endpoints.MapEndpoint<UpdateSpacesEndpoint>();
+        endpoints.MapEndpoint<UpdateSpaceEndpoint>();
         endpoints.MapEndpoint<UpdateSpaceUsersEndpoint>();
         endpoints.MapEndpoint<JoinSpaceEndpoint>();
 

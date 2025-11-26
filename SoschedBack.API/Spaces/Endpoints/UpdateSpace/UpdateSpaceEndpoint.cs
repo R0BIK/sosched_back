@@ -9,7 +9,7 @@ using SoschedBack.Storage;
 
 namespace SoschedBack.Spaces.Endpoints.UpdateSpace;
 
-public class UpdateSpacesEndpoint : IEndpoint
+public class UpdateSpaceEndpoint : IEndpoint
 {
     public static IEndpointConventionBuilder Map(IEndpointRouteBuilder app) => app
         // Используем PATCH и ID пространства в URL

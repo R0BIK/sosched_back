@@ -45,6 +45,7 @@ public class GetSpacesEndpoint : IEndpoint
         var spaces = await database.Spaces
             .AsNoTracking()
             .Where(t => t.SpaceUsers.Any(u => u.UserId == user.Id))
+            .ApplySorting("Id", false)
             .Select(space => new Response(
                 space.Id,
                 space.Name,
