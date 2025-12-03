@@ -5,7 +5,7 @@ using SoschedBack.Storage;
 
 namespace SoschedBack.Users.Endpoints.UpdateUser;
 
-public class RequestValidator : AbstractValidator<UpdateUserEndpoint.RequestBody>
+public class RequestValidator : AbstractValidator<UpdateUserEndpoint.Request>
 {
     // public RequestValidator(SoschedBackDbContext database)
     // {

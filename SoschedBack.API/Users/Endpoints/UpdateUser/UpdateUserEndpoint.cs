@@ -7,6 +7,7 @@ using SoschedBack.Common.Extensions;
 using SoschedBack.Core.Common.UnifiedResponse;
 using SoschedBack.Core.Models;
 using SoschedBack.Storage;
+using SoschedBack.Common.Http;
 
 namespace SoschedBack.Users.Endpoints.UpdateUser;
 
@@ -15,17 +16,12 @@ public class UpdateUserEndpoint : IEndpoint
     public static IEndpointConventionBuilder Map(IEndpointRouteBuilder app)
     {
         return app
-            .MapPatch("/{id:int}", Handle) 
-            .WithSummary("Partially updates an existing user profile.")
-            .WithRequestValidation<RequestParameters>()
-            .WithRequestValidation<RequestBody>();
+            .MapPatch("/", Handle) 
+            .WithSummary("Partially updates the current user profile.")
+            .WithRequestValidation<Request>();
     }
     
-    public sealed record RequestParameters(
-        int Id
-    );
-
-    public sealed record RequestBody(
+    public sealed record Request(
         string? FirstName,
         string? LastName,
         string? Patronymic,
@@ -40,18 +36,23 @@ public class UpdateUserEndpoint : IEndpoint
     );
 
     private static async Task<Results<Ok<Result<Response>>, NotFound>> Handle(
-        [AsParameters] RequestParameters parameters,
-        [FromBody] RequestBody body,
+        [FromBody] Request body,
         IPasswordHasher<User> passwordHasher,
+        IUserProvider userProvider,
         SoschedBackDbContext db,
         CancellationToken cancellationToken
     )
     {
-        // 1. Находим пользователя
+        var currentUserId = userProvider.GetUser().Id;
+        
         var user = await db.Users
-            .FirstOrDefaultAsync(u => u.Id == parameters.Id, cancellationToken);
+            .FirstOrDefaultAsync(u => u.Id == currentUserId, cancellationToken);
+        
+        if (user is null)
+        {
+            return TypedResults.NotFound();
+        }
 
-        // 2. Обновляем сущность
         UpdateUserEntity(user, body, passwordHasher);
 
         await db.SaveChangesAsync(cancellationToken);
@@ -65,7 +66,7 @@ public class UpdateUserEndpoint : IEndpoint
     /// </summary>
     private static void UpdateUserEntity(
         User user, 
-        RequestBody body, 
+        Request body, 
         IPasswordHasher<User> passwordHasher)
     {
         if (body.FirstName is not null)
@@ -86,6 +87,7 @@ public class UpdateUserEndpoint : IEndpoint
 
         if (body.Birthday.HasValue)
         {
+            Console.WriteLine("DSADS: " + body.Birthday.Value);
             user.Birthday = body.Birthday.Value;
         }
 

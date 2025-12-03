@@ -1,4 +1,3 @@
-using System.Linq.Dynamic.Core;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 using SoschedBack.Common;
@@ -26,12 +25,13 @@ public class GetEventsEndpoint : IEndpoint
     public sealed record Request(
         DateTimeOffset? DateFrom,
         DateTimeOffset? DateTo,
-        bool? IsPaged = true,
+        int? UserId = null,
         int? Page = 1,
         int? PageSize = 10,
         string? SortBy = null,
         bool Descending = false,
-        string? Filter = null
+        string? Filter = null,
+        string? Search = null
     ) : IPagedRequest, ISortRequest;
 
     private sealed record Response(
@@ -61,36 +61,10 @@ public class GetEventsEndpoint : IEndpoint
     )
     {
         var spaceId = spaceProvider.GetSpace();
-        bool isPaged = request.IsPaged is true or null;
+        var baseQuery = ApplyFilters(spaceId, request, database);
+        var isPaged = !request.UserId.HasValue;
         
         // var sortedQuery = BuildSortedUsersCountQuery(request, spaceId, database);
-
-        var baseQuery = database.Events
-            .AsNoTracking()
-            .Where(i => i.SpaceId == spaceId);
-        
-        if (request.DateFrom.HasValue)
-        {
-            baseQuery = baseQuery.Where(i => i.DateStart >= request.DateFrom.Value);
-        }
-        
-        if (request.DateTo.HasValue)
-        {
-            baseQuery = baseQuery.Where(i => i.DateEnd <= request.DateTo.Value);
-        }
-
-        if (request.Filter is not null)
-        {
-            
-        }
-
-        if (!isPaged)
-        {
-            var user = userProvider.GetUser();
-            baseQuery = baseQuery
-                .AsNoTracking()
-                .Where(i => i.EventToSpaceUsers.Any(u => u.SpaceUser.UserId == user.Id));
-        }
 
         var events = baseQuery
             .Include(e => e.Creator).ThenInclude(su => su.User)
@@ -125,6 +99,58 @@ public class GetEventsEndpoint : IEndpoint
         
         var fullList = await events.ToListAsync(ct);
         return TypedResults.Ok(Result.Success(fullList));
+    }
+    
+    private static IQueryable<Event> ApplyFilters(
+        int spaceId,
+        Request request,
+        SoschedBackDbContext dbContext
+    )
+    {
+        var baseQuery = dbContext.Events
+            .AsNoTracking()
+            .Where(i => i.SpaceId == spaceId);
+        
+        if (request.DateFrom.HasValue)
+        {
+            baseQuery = baseQuery.Where(i => i.DateStart >= request.DateFrom.Value);
+        }
+        
+        if (request.DateTo.HasValue)
+        {
+            baseQuery = baseQuery.Where(i => i.DateEnd <= request.DateTo.Value);
+        }
+        
+        if (request.UserId.HasValue)
+        {
+            var user = request.UserId.Value;
+            baseQuery = baseQuery
+                .AsNoTracking()
+                .Where(i => i.EventToSpaceUsers.Any(u => u.SpaceUser.UserId == user));
+
+            return baseQuery;
+        }
+
+        var search = request.Search;
+        var filters = FilterParser.Parse(request.Filter);
+        
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+            var searchLower = $"%{search.ToLower()}%";
+    
+            baseQuery = baseQuery.Where(u =>
+                EF.Functions.ILike((u.Name), searchLower)
+            );
+        }
+        
+        if (filters.Has(FilterConstants.UserKey))
+        {
+            var users = filters.GetIntValues(FilterConstants.UserKey);
+            baseQuery = baseQuery
+                .Where(u => u.EventToSpaceUsers.Any(es => users.Contains(es.SpaceUser.UserId)));
+        }
+    
+        return baseQuery;
     }
 
     // private static IQueryable<Response> BuildSortedUsersCountQuery(
@@ -166,12 +192,12 @@ public class GetEventsEndpoint : IEndpoint
     //             .Where(i => i.EventToSpaceUsers.Any(u => users.Contains(u.SpaceUser.UserId)));
     //     }
     //     
-    //     if (filters.Has(FilterConstants.TagKey))
-    //     {
-    //         var tags = filters.GetValues(FilterConstants.TagKey);
-    //         baseQuery = baseQuery
-    //             .Where(i => i.EventToSpaceUsers.Any(u => users.Contains(u.SpaceUser.UserId)));
-    //     }
+    //     // if (filters.Has(FilterConstants.TagKey))
+    //     // {
+    //     //     var tags = filters.GetValues(FilterConstants.TagKey);
+    //     //     baseQuery = baseQuery
+    //     //         .Where(i => i.EventToSpaceUsers.Any(u => users.Contains(u.SpaceUser.UserId)));
+    //     // }
     //
     //     return baseQuery;
     // }

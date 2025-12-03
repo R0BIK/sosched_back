@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("SoschedBack.API")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+dfd91d1d92766d7c9e594a02babb9672d7830824")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+92c30a440196bc1f9c7180317d0592f417d51d6f")]
 [assembly: System.Reflection.AssemblyProductAttribute("SoschedBack.API")]
 [assembly: System.Reflection.AssemblyTitleAttribute("SoschedBack.API")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

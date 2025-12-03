@@ -130,7 +130,7 @@ public class GetUsersEndpoint : IEndpoint
         {
             var roles = filters.GetValues(FilterConstants.RoleKey);
             baseQuery = baseQuery
-                .Where(u => u.SpaceUsers.Any(su => roles.Contains(su.Role.Name)));
+                .Where(u => u.SpaceUsers.Any(su => roles.Contains(su.Role.Name) && su.SpaceId == spaceId));
         }
         
         foreach (var key in filters.Keys.Where(k => k.StartsWith(FilterConstants.TagTypePrefix, StringComparison.OrdinalIgnoreCase)))
@@ -142,7 +142,8 @@ public class GetUsersEndpoint : IEndpoint
                 u.SpaceUsers.Any(su =>
                     su.TagToSpaceUsers.Any(tsu =>
                         tsu.Tag.TagType.Name == tagTypeName &&
-                        tagNames.Contains(tsu.Tag.Name)
+                        tagNames.Contains(tsu.Tag.Name) &&
+                        tsu.SpaceUser.SpaceId == spaceId
                     )
                 )
             );
@@ -152,14 +153,14 @@ public class GetUsersEndpoint : IEndpoint
         {
             var tags = filters.GetValues(FilterConstants.TagKey);
             baseQuery = baseQuery
-                .Where(u => u.SpaceUsers.Any(su => (su.TagToSpaceUsers.Any(sut => tags.Contains(sut.Tag.ShortName)))));
+                .Where(u => u.SpaceUsers.Any(su => su.TagToSpaceUsers.Any(sut => tags.Contains(sut.Tag.ShortName) && sut.SpaceUser.SpaceId == spaceId)));
         }
         
         if (filters.Has(FilterConstants.EventKey))
         {
             var events = filters.GetIntValues(FilterConstants.EventKey);
             baseQuery = baseQuery
-                .Where(u => u.SpaceUsers.Any(su => (su.EventToSpaceUsers.Any(sut => events.Contains(sut.Event.Id)))));
+                .Where(u => u.SpaceUsers.Any(su => su.EventToSpaceUsers.Any(sut => events.Contains(sut.Event.Id) && sut.SpaceUser.SpaceId == spaceId)));
         }
 
         return baseQuery;

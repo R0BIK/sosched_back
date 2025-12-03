@@ -23,7 +23,7 @@ public class GetUserByIdEndpoint : IEndpoint
         string LastName,
         string? Patronymic,
         string Email,
-        DateOnly? BirthDate,
+        DateOnly? Birthday,
         string IconPath,
         string Role
     );
