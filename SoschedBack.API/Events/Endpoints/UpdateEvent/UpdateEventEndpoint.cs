@@ -32,15 +32,14 @@ public class UpdateEventEndpoint : IEndpoint
         int? CoordinatorId
     );
     
-    // ВОЗВРАЩЕНО: Response возвращает только DateTimeOffset
     private sealed record Response(
         int Id,
         string Name,
         string? Location,
         string? Description,
         string Color,
-        DateTimeOffset DateStart, // <-- ВОЗВРАТ
-        DateTimeOffset DateEnd,   // <-- ВОЗВРАТ
+        DateTimeOffset DateStart,
+        DateTimeOffset DateEnd,
         int? CoordinatorId
     );
 

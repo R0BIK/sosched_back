@@ -172,34 +172,5 @@ public class GetEventsEndpoint : IEndpoint
     //
     //     return query.ApplySorting(request.SortBy, request.Descending);
     // }
-    
-    // private static IQueryable<Event> ApplyFilters(
-    //     int spaceId,
-    //     ParsedFilter filters,
-    //     Request request,
-    //     SoschedBackDbContext dbContext
-    // )
-    // {
-    //     var baseQuery = dbContext.Events
-    //         .AsNoTracking()
-    //         .Where(i => i.SpaceId == spaceId)
-    //         .Where(i => i.DateStart >= request.DateFrom && i.DateEnd <= request.DateTo);
-    //     
-    //     if (filters.HasIntValues(FilterConstants.UserKey))
-    //     {
-    //         var users = filters.GetIntValues(FilterConstants.UserKey);
-    //         baseQuery = baseQuery
-    //             .Where(i => i.EventToSpaceUsers.Any(u => users.Contains(u.SpaceUser.UserId)));
-    //     }
-    //     
-    //     // if (filters.Has(FilterConstants.TagKey))
-    //     // {
-    //     //     var tags = filters.GetValues(FilterConstants.TagKey);
-    //     //     baseQuery = baseQuery
-    //     //         .Where(i => i.EventToSpaceUsers.Any(u => users.Contains(u.SpaceUser.UserId)));
-    //     // }
-    //
-    //     return baseQuery;
-    // }
 }
 

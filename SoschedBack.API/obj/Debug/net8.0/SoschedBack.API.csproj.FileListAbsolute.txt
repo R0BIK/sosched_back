@@ -121,3 +121,4 @@
 /Users/ROBIK/Desktop/SoschedBack/SoschedBack/SoschedBack.API/bin/Debug/net8.0/FluentValidation.dll
 /Users/ROBIK/Desktop/SoschedBack/SoschedBack/SoschedBack.API/bin/Debug/net8.0/FluentValidation.DependencyInjectionExtensions.dll
 /Users/ROBIK/Desktop/SoschedBack/SoschedBack/SoschedBack.API/bin/Debug/net8.0/System.Linq.Dynamic.Core.dll
+/Users/ROBIK/Desktop/SoschedBack/SoschedBack/SoschedBack.API/obj/Debug/net8.0/SoschedBack.API.sourcelink.json

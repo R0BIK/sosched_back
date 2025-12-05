@@ -12,3 +12,4 @@
 /Users/ROBIK/Desktop/SoschedBack/SoschedBack/SoschedBack.Core/obj/Debug/net8.0/ref/SoschedBack.Core.dll
 /Users/ROBIK/Desktop/SoschedBack/SoschedBack/SoschedBack.Core/bin/Debug/net8.0/SoschedBack.Core.runtimeconfig.json
 /Users/ROBIK/Desktop/SoschedBack/SoschedBack/SoschedBack.Core/obj/Debug/net8.0/SoschedBack.Core.genruntimeconfig.cache
+/Users/ROBIK/Desktop/SoschedBack/SoschedBack/SoschedBack.Core/obj/Debug/net8.0/SoschedBack.Core.sourcelink.json

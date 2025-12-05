@@ -48,13 +48,13 @@ public class UpdateTagEndpoint : IEndpoint
         var spaceId = spaceProvider.GetSpace();
         
         var tag = await database.Tags
-            .AsNoTracking()
             .FirstAsync(
             t => t.Id == parameters.TagId && t.SpaceId == spaceId, 
             cancellationToken
         );
 
         UpdateTagEntity(tag, body);
+        Console.WriteLine("UPTAG:" + tag.Name);
 
         await database.SaveChangesAsync(cancellationToken);
         

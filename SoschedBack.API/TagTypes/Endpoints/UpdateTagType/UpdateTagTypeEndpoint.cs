@@ -44,7 +44,7 @@ public class UpdateTagTypeEndpoint : IEndpoint
         
         // 1. Находим существующий тип тега по ID и SpaceId
         var tagType = await database.TagTypes
-            .FirstOrDefaultAsync(t => t.Id == parameters.Id && t.SpaceId == spaceId, cancellationToken);
+            .FirstAsync(t => t.Id == parameters.Id && t.SpaceId == spaceId, cancellationToken);
 
         UpdateTagTypeEntity(tagType, body);
 

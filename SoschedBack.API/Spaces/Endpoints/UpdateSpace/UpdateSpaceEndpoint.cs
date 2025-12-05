@@ -45,7 +45,7 @@ public class UpdateSpaceEndpoint : IEndpoint
     {
         // 1. Находим существующее пространство
         var space = await database.Spaces
-            .FirstOrDefaultAsync(s => s.Id == parameters.Id, cancellationToken);
+            .FirstAsync(s => s.Id == parameters.Id, cancellationToken);
 
         // 2. Обновляем сущность
         UpdateSpaceEntity(space, body);

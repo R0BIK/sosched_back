@@ -15,3 +15,4 @@
 /Users/ROBIK/Desktop/SoschedBack/SoschedBack/SoschedBack.Storage/obj/Debug/net8.0/ref/SoschedBack.Storage.dll
 /Users/ROBIK/Desktop/SoschedBack/SoschedBack/SoschedBack.Storage/bin/Debug/net8.0/SoschedBack.Storage.runtimeconfig.json
 /Users/ROBIK/Desktop/SoschedBack/SoschedBack/SoschedBack.Storage/obj/Debug/net8.0/SoschedBack.Storage.genruntimeconfig.cache
+/Users/ROBIK/Desktop/SoschedBack/SoschedBack/SoschedBack.Storage/obj/Debug/net8.0/SoschedBack.Storage.sourcelink.json
