@@ -18,6 +18,7 @@ using SoschedBack.Roles.Endpoints.GetRoles;
 using SoschedBack.Roles.Endpoints.UpdateRoleUsers;
 using SoschedBack.Search.SearchUsersAndTags;
 using SoschedBack.Spaces.Endpoints.CreateSpaces;
+using SoschedBack.Spaces.Endpoints.DeleteSpaceUser;
 using SoschedBack.Spaces.Endpoints.GetSpaceById;
 using SoschedBack.Spaces.Endpoints.GetSpaces;
 using SoschedBack.Spaces.Endpoints.JoinSpace;
@@ -120,7 +121,6 @@ public static class Endpoints
         endpoints.MapEndpoint<UpdateSpaceEndpoint>();
         endpoints.MapEndpoint<UpdateSpaceUsersEndpoint>();
         endpoints.MapEndpoint<JoinSpaceEndpoint>();
-
     }
 
     private static void MapTagEndpoints(this IEndpointRouteBuilder app)
@@ -144,7 +144,7 @@ public static class Endpoints
         endpoints.MapEndpoint<GetUsersEndpoint>();
         endpoints.MapEndpoint<GetUserByIdEndpoint>();
         endpoints.MapEndpoint<UpdateUserEndpoint>();
-
+        endpoints.MapEndpoint<DeleteSpaceUsers>();
     }
 
     private static void MapTagTypeEndpoints(this IEndpointRouteBuilder app)

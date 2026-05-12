@@ -133,27 +133,28 @@ public class GetUsersEndpoint : IEndpoint
                 .Where(u => u.SpaceUsers.Any(su => roles.Contains(su.Role.Name) && su.SpaceId == spaceId));
         }
         
-        foreach (var key in filters.Keys.Where(k => k.StartsWith(FilterConstants.TagTypePrefix, StringComparison.OrdinalIgnoreCase)))
-        {
-            var tagTypeName = key[FilterConstants.TagTypePrefix.Length..];
-            var tagNames = filters.GetValues(key);
-
-            baseQuery = baseQuery.Where(u =>
-                u.SpaceUsers.Any(su =>
-                    su.TagToSpaceUsers.Any(tsu =>
-                        tsu.Tag.TagType.Name == tagTypeName &&
-                        tagNames.Contains(tsu.Tag.Name) &&
-                        tsu.SpaceUser.SpaceId == spaceId
-                    )
-                )
-            );
-        }
+        // foreach (var key in filters.Keys.Where(k => k.StartsWith(FilterConstants.TagTypePrefix, StringComparison.OrdinalIgnoreCase)))
+        // {
+        //     var tagTypeName = key[FilterConstants.TagTypePrefix.Length..];
+        //     var tagNames = filters.GetValues(key);
+        //
+        //     baseQuery = baseQuery.Where(u =>
+        //         u.SpaceUsers.Any(su =>
+        //             su.TagToSpaceUsers.Any(tsu =>
+        //                 tsu.Tag.TagType.Name == tagTypeName &&
+        //                 tagNames.Contains(tsu.Tag.Name) &&
+        //                 tsu.SpaceUser.SpaceId == spaceId
+        //             )
+        //         )
+        //     );
+        // }
         
         if (filters.Has(FilterConstants.TagKey))
         {
-            var tags = filters.GetValues(FilterConstants.TagKey);
-            baseQuery = baseQuery
-                .Where(u => u.SpaceUsers.Any(su => su.TagToSpaceUsers.Any(sut => tags.Contains(sut.Tag.ShortName) && sut.SpaceUser.SpaceId == spaceId)));
+            baseQuery = ApplySmartTagFilter(baseQuery, spaceId, filters, dbContext);
+            // var tags = filters.GetValues(FilterConstants.TagKey);
+            // baseQuery = baseQuery
+            //     .Where(u => u.SpaceUsers.Any(su => su.TagToSpaceUsers.Any(sut => tags.Contains(sut.Tag.ShortName) && sut.SpaceUser.SpaceId == spaceId)));
         }
         
         if (filters.Has(FilterConstants.EventKey))
@@ -164,5 +165,56 @@ public class GetUsersEndpoint : IEndpoint
         }
 
         return baseQuery;
+    }
+    
+    private static IQueryable<User> ApplySmartTagFilter(
+        IQueryable<User> query,
+        int spaceId,
+        ParsedFilter filters,
+        SoschedBackDbContext dbContext)
+    {
+        // Проверяем, есть ли фильтр 'tags' (или как он у тебя в константах)
+        if (!filters.Has(FilterConstants.TagKey))
+        {
+            return query;
+        }
+
+        // 1. Получаем список имен тегов с фронта (например: ["ИП-31", "ИП-32", "Староста"])
+        var requestedTagNames = filters.GetValues(FilterConstants.TagKey);
+
+        if (requestedTagNames == null || !requestedTagNames.Any())
+        {
+            return query;
+        }
+
+        // 2. Узнаем TagTypeId для этих тегов (легкий запрос)
+        // Группируем теги, чтобы понять: какие из них "однотипные" (ИЛИ), а какие "разные" (И)
+        var tagsInfo = dbContext.Tags
+            .AsNoTracking()
+            .Where(t => t.SpaceId == spaceId && requestedTagNames.Contains(t.ShortName))
+            .Select(t => new { t.ShortName, t.TagTypeId })
+            .ToList();
+
+        var tagsByGroup = tagsInfo.GroupBy(t => t.TagTypeId);
+
+        // 3. Динамически накладываем фильтры
+        foreach (var group in tagsByGroup)
+        {
+            var namesInThisType = group.Select(x => x.ShortName).ToArray();
+
+            // Добавляем условие Where (AND). Внутри условия используем Contains (OR).
+            // Логика: Пользователь должен иметь ( (ТегА ИЛИ ТегБ из Группы1) И (ТегС из Группы2) )
+            query = query.Where(u =>
+                u.SpaceUsers.Any(su =>
+                    su.SpaceId == spaceId &&
+                    su.TagToSpaceUsers.Any(tsu =>
+                            tsu.Tag.TagTypeId == group.Key &&     // Тег относится к текущей группе
+                            namesInThisType.Contains(tsu.Tag.ShortName) // Имя тега совпадает с одним из запрошенных
+                    )
+                )
+            );
+        }
+
+        return query;
     }
 }

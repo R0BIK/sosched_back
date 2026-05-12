@@ -38,7 +38,7 @@ public static class ConfigureApp
 
         app.MapEndpoints();
 
-        await SeedDatabase(app);
+        // await SeedDatabase(app);
 
         await app.EnsureDatabaseCreated();
     }

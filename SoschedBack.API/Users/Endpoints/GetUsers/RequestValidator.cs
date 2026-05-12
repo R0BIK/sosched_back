@@ -38,10 +38,6 @@ public class RequestValidator : AbstractValidator<GetUsersEndpoint.Request>
                             {
                                 await ValidateRolesAsync(values, spaceId, dbContext, context, ct);
                             }
-                            else if (key.StartsWith(FilterConstants.TagTypePrefix, StringComparison.OrdinalIgnoreCase))
-                            {
-                                await ValidateTagTypeAsync(key, values, spaceId, dbContext, context, ct);
-                            }
                             else if (key.StartsWith(FilterConstants.TagKey, StringComparison.OrdinalIgnoreCase))
                             {
                                 await ValidateTagsAsync(values, spaceId, dbContext, context, ct);
@@ -120,38 +116,5 @@ public class RequestValidator : AbstractValidator<GetUsersEndpoint.Request>
         {
             context.AddFailure($"Invalid tags: {string.Join(", ", invalidTags)}.");
         }
-    }
-    
-    private static async Task ValidateTagTypeAsync(
-        string key,
-        IEnumerable<string> values,
-        int spaceId,
-        SoschedBackDbContext dbContext,
-        CustomContext context,
-        CancellationToken ct)
-    {
-        var tagTypeName = key[FilterConstants.TagTypePrefix.Length..];
-
-        var tagType = await dbContext.TagTypes
-            .AsNoTracking()
-            .FirstOrDefaultAsync(t => t.Name == tagTypeName && t.SpaceId == spaceId, ct);
-
-        if (tagType is null)
-        {
-            context.AddFailure($"Tag type '{tagTypeName}' does not exist in current space.");
-            return;
-        }
-
-        var existingTags = await dbContext.Tags
-            .AsNoTracking()
-            .Where(t => t.SpaceId == spaceId &&
-                        t.TagTypeId == tagType.Id &&
-                        values.Contains(t.Name))
-            .Select(t => t.Name)
-            .ToListAsync(ct);
-
-        var invalidTags = values.Except(existingTags, StringComparer.OrdinalIgnoreCase).ToArray();
-        if (invalidTags.Length > 0)
-            context.AddFailure($"Invalid tags for '{tagTypeName}': {string.Join(", ", invalidTags)}.");
     }
 }

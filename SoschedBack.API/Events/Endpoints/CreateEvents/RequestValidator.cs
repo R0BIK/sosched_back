@@ -26,14 +26,14 @@ public class RequestValidator : AbstractValidator<CreateEventsEndpoint.Request>
         RuleFor(x => x.Color)
             .MustBeValidString();
         
-        RuleFor(x => x.CoordinatorId)
-            .MustBeValidOptionalId()
-            .DependentRules(() =>
-            {
-                RuleFor(x => x.CoordinatorId)
-                    .MustBeValidOptionalSpaceEntityId<CreateEventsEndpoint.Request, SpaceUser>(database, spaceId)
-                    .When(x => x.CoordinatorId.HasValue);
-            });
+        // RuleFor(x => x.CoordinatorId)
+        //     .MustBeValidOptionalId()
+        //     .DependentRules(() =>
+        //     {
+        //         RuleFor(x => x.CoordinatorId)
+        //             .MustBeValidOptionalSpaceEntityId<CreateEventsEndpoint.Request, SpaceUser>(database, spaceId)
+        //             .When(x => x.CoordinatorId.HasValue);
+        //     }); //TODO: Fix bug, it checks spaceUserId, but it gets UserId
 
         RuleFor(r => r.DateStart)
             .MustBeValidDate()

@@ -15,13 +15,7 @@ public class GetTagTypesEndpoint : IEndpoint
 {
     public static IEndpointConventionBuilder Map(IEndpointRouteBuilder app) => app
         .MapGet("/", Handle)
-        .WithSummary("Returns a list of tag types.")
-        .WithRequestValidation<Request>();
-
-    public sealed record Request(
-        int? Page = 1,
-        int? PageSize = 10
-    ) : IPagedRequest;
+        .WithSummary("Returns a list of tag types.");
     
     private sealed record Response(
         int Id,
@@ -30,8 +24,7 @@ public class GetTagTypesEndpoint : IEndpoint
         int UsersCount
     );
 
-    private static async Task<Ok<Result<PagedList<Response>>>> Handle(
-        [AsParameters] Request request,
+    private static async Task<Ok<Result<List<Response>>>> Handle(
         ISpaceProvider spaceProvider,
         SoschedBackDbContext database,
         CancellationToken ct
@@ -48,7 +41,7 @@ public class GetTagTypesEndpoint : IEndpoint
                 database.Tags.Count(t => t.SpaceId == spaceId && t.TagTypeId == tt.Id),
                 database.TagToSpaceUsers.Count(tsu => tsu.Tag.TagTypeId == tt.Id)
             ))
-            .ToPagedListAsync(request, ct);
+            .ToListAsync(ct);
         
         var result = Result.Success(tagTypes);
         
